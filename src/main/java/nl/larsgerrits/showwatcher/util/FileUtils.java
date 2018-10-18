@@ -2,11 +2,14 @@ package nl.larsgerrits.showwatcher.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import nl.larsgerrits.showwatcher.Reference;
+import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.data.EpisodeData;
 import nl.larsgerrits.showwatcher.data.SeasonData;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,7 +18,6 @@ import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,21 +28,17 @@ import java.util.stream.Collectors;
 
 public class FileUtils
 {
-    // public static final TraktV2 TRAKT_TV = new TraktV2("d37bc084cad26a17a8a4ae8bf01eb73262e9ae15823351257f87c335c69f466d", "ba0b07289702f71b73c3427503c5d62598bcd2d83e62d8e0d9b4496a4699c328", "http://www.google.com");
-    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     
-    private static final Path DIRECTORY = Paths.get("G:", "TV Series");
-    public static final Path CACHE_DIRECTORY = DIRECTORY.resolve("_cache");
-    private static final Path SEASON_INFO = Paths.get("season_info.json");
     private static final Pattern DIACRITICS_AND_FRIENDS = Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
     
-    public static void loadShowsFromDisk(BiFunction<Path, SeasonData, TVSeason> seasonDataConsumer)
+    public static void loadShowsFromDisk(@Nonnull BiFunction<Path, SeasonData, TVSeason> seasonDataConsumer)
     {
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(DIRECTORY))
+        try (DirectoryStream<Path> showPaths = Files.newDirectoryStream(Settings.BASE_PATH))
         {
-            for (Path path : directoryStream)
+            for (Path path : showPaths)
             {
-                if (Files.exists(path.resolve(SEASON_INFO)))
+                if (Files.exists(path.resolve(Reference.SEASON_INFO)))
                 {
                     SeasonData data = parseSeasonData(path);
                     if (data != null)
@@ -57,24 +55,26 @@ public class FileUtils
     
     private static boolean checkSeasonData(SeasonData data)
     {
-        Path seasonPath = DIRECTORY.resolve(fixFileName(data.getTitle()) + "_season_" + data.getSeason());
+        Path seasonPath = Settings.BASE_PATH.resolve(String.format("%s_season_%d", getSimplefiedName(data.getTitle()), data.getSeason()));
         boolean result = false;
         
-        for (EpisodeData episode : data.getEpisodeData())
+        if (data.getEpisodeData() != null)
         {
-            if (!Files.exists(seasonPath.resolve(episode.getFileName())))
+            for (EpisodeData episode : data.getEpisodeData())
             {
-                episode.setFileName("");
-                result = true;
-            }
-            String correctFileName = getEpisodeFileName(episode.getEpisode(), episode.getTitle());
-            if (Files.exists(seasonPath.resolve(correctFileName)))
-            {
-                episode.setFileName(correctFileName);
-                result = true;
+                if (!Files.exists(seasonPath.resolve(episode.getFileName())))
+                {
+                    episode.setFileName("");
+                    result = true;
+                }
+                String correctFileName = getEpisodeFileName(episode.getEpisode(), episode.getTitle());
+                if (Files.exists(seasonPath.resolve(correctFileName)))
+                {
+                    episode.setFileName(correctFileName);
+                    result = true;
+                }
             }
         }
-        
         return result;
     }
     
@@ -82,7 +82,7 @@ public class FileUtils
     {
         try
         {
-            String content = new String(Files.readAllBytes(path.resolve(SEASON_INFO)));
+            String content = new String(Files.readAllBytes(path.resolve(Reference.SEASON_INFO)));
             if (!content.isEmpty())
             {
                 return GSON.fromJson(content, SeasonData.class);
@@ -105,7 +105,7 @@ public class FileUtils
         }
         SeasonData data = new SeasonData(season.getTVShow().getTitle(), season.getTVShow().getImdbId(), season.getSeasonNumber(), season.getTotalEpisodes(), season.getReleaseDate() == null ? 0L : season.getReleaseDate().getTime(), episodeData);
         
-        File dir = new File(DIRECTORY + File.separator + fixFileName(season.getTVShow().getTitle()) + "_season_" + season.getSeasonNumber());
+        File dir = new File(Settings.BASE_PATH + File.separator + getSimplefiedName(season.getTVShow().getTitle()) + "_season_" + season.getSeasonNumber());
         
         if (!dir.exists()) dir.mkdir();
         
@@ -166,7 +166,7 @@ public class FileUtils
      * //                     if (map.containsKey(episode.number)) ep.setFileName(map.get(episode.number));
      * //                     if (toRename.keySet().contains(episode.number))
      * //                     {
-     * //                         String fileName = "episode_" + String.format("%02d", episode.number) + "_" + fixFileName(episode.title) + ".mkv";
+     * //                         String fileName = "episode_" + String.format("%02d", episode.number) + "_" + getSimplefiedName(episode.title) + ".mkv";
      * //                         ep.setFileName(fileName);
      * //                         File f = toRename.get(episode.number);
      * //                         String newPath = f.getParent() + "\\" + fileName;
@@ -199,7 +199,7 @@ public class FileUtils
      * // }
      * //
      */
-    public static String fixFileName(String filename)
+    public static String getSimplefiedName(String filename)
     {
         return stripDiacritics(filename.toLowerCase()).replace(' ', '_')//
                                                       .replace('-', '_')//
@@ -216,7 +216,7 @@ public class FileUtils
     
     public static void writeIdMap(Map<String, Integer> imdbToTmdb)
     {
-        write(CACHE_DIRECTORY.resolve("_id_map.json"), GSON.toJson(imdbToTmdb));
+        write(Settings.CACHE_PATH.resolve(Reference.ID_MAP), GSON.toJson(imdbToTmdb));
     }
     
     @SuppressWarnings("unchecked")
@@ -224,16 +224,13 @@ public class FileUtils
     {
         try
         {
-            Map<String, Double> jsonMap = GSON.fromJson(Files.lines(CACHE_DIRECTORY.resolve("_id_map.json"), Charset.forName("UTF-8")).collect(Collectors.joining()), Map.class);
+            Map<String, Double> jsonMap = GSON.fromJson(Files.lines(Settings.CACHE_PATH.resolve(Reference.ID_MAP), Charset.forName("UTF-8")).collect(Collectors.joining()), Map.class);
             for (Map.Entry<String, Double> entry : jsonMap.entrySet())
             {
                 imdbToTmdb.put(entry.getKey(), (int) entry.getValue().doubleValue());
             }
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        catch (IOException ignored) { }
     }
     
     private static void write(Path path, String content)
@@ -242,19 +239,16 @@ public class FileUtils
         {
             writer.write(content);
         }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
-        }
+        catch (IOException ignored) { }
     }
     
     public static Path getSaveDir(TVEpisode episode)
     {
-        return DIRECTORY.resolve(fixFileName(episode.getSeason().getTVShow().getTitle()) + "_season_" + episode.getSeason().getSeasonNumber());
+        return Settings.BASE_PATH.resolve(getSimplefiedName(episode.getSeason().getTVShow().getTitle()) + "_season_" + episode.getSeason().getSeasonNumber());
     }
     
     public static String getEpisodeFileName(int episode, String title)
     {
-        return "episode_" + String.format("%02d", episode) + "_" + fixFileName(title) + ".mkv";
+        return "episode_" + String.format("%02d", episode) + "_" + getSimplefiedName(title) + ".mkv";
     }
 }

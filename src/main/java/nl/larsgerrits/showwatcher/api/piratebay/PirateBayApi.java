@@ -22,7 +22,7 @@ public final class PirateBayApi
     
     private static Query constructQuery(TVEpisode episode)
     {
-        return new Query(FileUtils.fixFileName(episode.getSeason().getTVShow().getTitle()).replace("_", "%20") + "%20s" + String.format("%02d", episode.getSeason().getSeasonNumber()) + "e" + String.format("%02d", episode.getEpisodeNumber()), 0);
+        return new Query(FileUtils.getSimplefiedName(episode.getSeason().getTVShow().getTitle()).replace("_", "%20") + "%20s" + String.format("%02d", episode.getSeason().getSeasonNumber()) + "e" + String.format("%02d", episode.getEpisodeNumber()), 0);
     }
     
 }

@@ -3,6 +3,7 @@ package nl.larsgerrits.showwatcher.manager;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeries;
+import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.Threading;
 import nl.larsgerrits.showwatcher.api.tmdb.IDMapper;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
@@ -16,10 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
+import static nl.larsgerrits.showwatcher.util.FileUtils.*;
+
 public final class ImageManager
 {
-    private static final String DEFAULT_IMAGE = "@..\\..\\image\\default.png";
-    private static final String DEFAULT_IMAGE_WIDE = "@..\\..\\image\\default_wide.png";
+    private static final String DEFAULT_IMAGE = "@../../image/default.png";
+    private static final String DEFAULT_IMAGE_WIDE = "@../../image/default_wide.png";
     private static TmdbApi TMDB_API = new TmdbApi("83fed95ccc330d5b194e5039d40387d6");
     
     public ImageManager()
@@ -28,7 +31,7 @@ public final class ImageManager
     
     public static String getPosterURLForTVShow(TVShow show, Consumer<String> onDownloadCallback)
     {
-        Path path = FileUtils.CACHE_DIRECTORY.resolve(show.getImdbId() + ".png");
+        Path path = Settings.CACHE_PATH.resolve(show.getImdbId() + ".png");
         
         if (Files.exists(path)) return "file:" + path;
         
@@ -58,14 +61,14 @@ public final class ImageManager
     }
     
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean saveImage(String webUrl, String dest)
+    private static boolean saveImage(String webUrl, String dest)
     {
         try
         {
             URL url = new URL(webUrl);
             InputStream is = url.openStream();
             
-            if (!Files.exists(FileUtils.CACHE_DIRECTORY)) Files.createDirectory(FileUtils.CACHE_DIRECTORY);
+            if (!Files.exists(Settings.CACHE_PATH)) Files.createDirectory(Settings.CACHE_PATH);
             
             File file = new File(dest);
             file.createNewFile();
@@ -129,7 +132,7 @@ public final class ImageManager
     //
     public static String getPosterURLForTVEpisode(TVEpisode episode, Consumer<String> onDownloadImage)
     {
-        Path path = FileUtils.CACHE_DIRECTORY.resolve(episode.getSeason().getTVShow().getImdbId() + "_" + episode.getSeason().getSeasonNumber() + "_" + episode.getEpisodeNumber() + ".png");
+        Path path = Settings.CACHE_PATH.resolve(episode.getSeason().getTVShow().getImdbId() + "_" + episode.getSeason().getSeasonNumber() + "_" + episode.getEpisodeNumber() + ".png");
         
         if (Files.exists(path)) return "file:" + path;
         

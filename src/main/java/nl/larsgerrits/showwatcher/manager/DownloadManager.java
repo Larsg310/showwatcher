@@ -48,7 +48,7 @@ public final class DownloadManager
         // int nIndex = magnetUrl.indexOf("&", dnIndex + 3);
         //
         // String from = magnetUrl.substring(dnIndex, nIndex);
-        // String to = "&dn=episode_" + String.format("%02d", episode.getEpisodeNumber()) + "_" + FileUtils.fixFileName(episode.getTitle());
+        // String to = "&dn=episode_" + String.format("%02d", episode.getEpisodeNumber()) + "_" + FileUtils.getSimplefiedName(episode.getTitle());
         //
         // System.out.println(from);
         // System.out.println(to);
