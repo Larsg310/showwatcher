@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import nl.larsgerrits.showwatcher.Main;
 import nl.larsgerrits.showwatcher.Threading;
 import nl.larsgerrits.showwatcher.manager.DescriptionManager;
 import nl.larsgerrits.showwatcher.manager.DownloadManager;
@@ -60,7 +61,7 @@ public class TabShow extends Tab
         scrollPane.setPrefHeight(250);
         
         AnchorPane infoPane = new AnchorPane();
-        infoPane.setPrefWidth(1784);
+        infoPane.setPrefWidth(Main.WIDTH);
         infoPane.setPrefHeight(250);
         
         title.setLayoutX(14);
@@ -76,12 +77,12 @@ public class TabShow extends Tab
         description.setLayoutY(70);
         description.setStrokeType(StrokeType.OUTSIDE);
         description.setStrokeWidth(0);
-        description.setWrappingWidth(890);
+        description.setWrappingWidth(Main.WIDTH / 2 - 20);
         description.setFont(new Font(18));
         description.setId("text");
         AnchorPane.setLeftAnchor(description, 16D);
         
-        descriptionDate.setLayoutX(910);
+        descriptionDate.setLayoutX(Main.WIDTH / 2 + 10);
         descriptionDate.setLayoutY(32);
         descriptionDate.setStrokeType(StrokeType.OUTSIDE);
         descriptionDate.setStrokeWidth(0);
@@ -153,7 +154,7 @@ public class TabShow extends Tab
         title.setText(show.getTitle() + ": Season " + season.getSeasonNumber());
         
         Date date = season.getReleaseDate();
-        descriptionDate.setText("Release Date: " + date.getDate() + "/" + (date.getMonth() + 1) + "/" + (date.getYear() + 1900));
+        descriptionDate.setText("Release Date: " + String.format("%02d", date.getDate()) + "/" + String.format("%02d", date.getMonth() + 1) + "/" + (date.getYear() + 1900));
         
         description.setText(DescriptionManager.getSeasonDescription(season, description::setText));
         
@@ -171,8 +172,10 @@ public class TabShow extends Tab
             
             actionButton.setOnMouseClicked(e -> {
                 ShowManager.saveSeasonToDisk(season);
-                for(TVEpisode episode : season){
-                    if(episode.getFileName().isEmpty() && episode.getReleaseDate().getTime() != 0 && episode.getReleaseDate().getTime() < System.currentTimeMillis()){
+                for (TVEpisode episode : season)
+                {
+                    if (episode.getFileName().isEmpty() && episode.getReleaseDate().getTime() > 0 && episode.getReleaseDate().getTime() < System.currentTimeMillis())
+                    {
                         DownloadManager.downloadEpisode(episode);
                     }
                 }

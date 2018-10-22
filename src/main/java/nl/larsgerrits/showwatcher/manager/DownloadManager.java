@@ -3,10 +3,14 @@ package nl.larsgerrits.showwatcher.manager;
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.alerts.*;
+import com.frostwire.jlibtorrent.alerts.AddTorrentAlert;
+import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.alerts.AlertType;
+import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
 import javafx.application.Platform;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api.TorrentCollector;
+import nl.larsgerrits.showwatcher.api_impl.TorrentCollector;
 import nl.larsgerrits.showwatcher.download.Download;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.Torrent;
@@ -39,28 +43,29 @@ public final class DownloadManager
     
     public static void downloadEpisode(TVEpisode episode)
     {
-        Torrent torrent = TorrentCollector.getTorrent(episode);
-        
-        // String magnetUrl = torrent.getMagnetUrl();
-        // System.out.println(magnetUrl);
-        //
-        // int dnIndex = magnetUrl.indexOf("&dn");
-        // int nIndex = magnetUrl.indexOf("&", dnIndex + 3);
-        //
-        // String from = magnetUrl.substring(dnIndex, nIndex);
-        // String to = "&dn=episode_" + String.format("%02d", episode.getEpisodeNumber()) + "_" + FileUtils.getSimplefiedName(episode.getTitle());
-        //
-        // System.out.println(from);
-        // System.out.println(to);
-    
-        System.out.println(torrent);
-        if (torrent != null)
-        {
-            Threading.DOWNLOAD_THREAD.execute(() -> {
+        Threading.DOWNLOAD_THREAD.execute(() -> {
+            Torrent torrent = TorrentCollector.getTorrent(episode);
+            
+            // String magnetUrl = torrent.getMagnetUrl();
+            // System.out.println(magnetUrl);
+            //
+            // int dnIndex = magnetUrl.indexOf("&dn");
+            // int nIndex = magnetUrl.indexOf("&", dnIndex + 3);
+            //
+            // String from = magnetUrl.substring(dnIndex, nIndex);
+            // String to = "&dn=episode_" + String.format("%02d", episode.getEpisodeNumber()) + "_" + FileUtils.getSimplefiedName(episode.getTitle());
+            //
+            // System.out.println(from);
+            // System.out.println(to);
+            
+            System.out.println(torrent);
+            if (torrent != null)
+            {
                 Download download = downloadMagnet(episode, /*magnetUrl.replace(from, to)*/torrent.getMagnetUrl());
                 if (downloadAddedCallback != null) Platform.runLater(() -> downloadAddedCallback.accept(download));
-            });
-        }
+            }
+        });
+        
         // System.out.println();
     }
     
@@ -120,8 +125,7 @@ public final class DownloadManager
             manager.start();
             
             waitForNodesInDHT(manager);
-            byte[] data
-                    = manager.fetchMagnet(magnetUrl, 60);
+            byte[] data = manager.fetchMagnet(magnetUrl, 60);
             TorrentInfo ti = TorrentInfo.bdecode(data);
             
             // System.out.println(Entry.bdecode(data).toString());

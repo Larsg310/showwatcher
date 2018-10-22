@@ -1,9 +1,9 @@
 package nl.larsgerrits.showwatcher.manager;
 
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api.tmdb.TMDBApi;
-import nl.larsgerrits.showwatcher.api.tmdb.TMDBEpisode;
-import nl.larsgerrits.showwatcher.api.tmdb.TMDBSeason;
+import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBApi;
+import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBEpisode;
+import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBSeason;
 import nl.larsgerrits.showwatcher.data.EpisodeData;
 import nl.larsgerrits.showwatcher.data.SeasonData;
 import nl.larsgerrits.showwatcher.show.TVEpisode;

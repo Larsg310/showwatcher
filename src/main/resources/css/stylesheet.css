@@ -32,7 +32,7 @@
 }
 
 #show-tab {
-    -fx-pref-width: 223;
+    /*-fx-pref-width: 223;*/
 }
 
 .tab {

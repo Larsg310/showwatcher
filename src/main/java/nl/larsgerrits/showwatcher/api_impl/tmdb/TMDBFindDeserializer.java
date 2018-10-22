@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api.tmdb;
+package nl.larsgerrits.showwatcher.api_impl.tmdb;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api.piratebay;
+package nl.larsgerrits.showwatcher.api_impl.piratebay;
 
 public class Constants {
 

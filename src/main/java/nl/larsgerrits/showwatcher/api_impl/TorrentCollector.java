@@ -1,16 +1,23 @@
-package nl.larsgerrits.showwatcher.api;
+package nl.larsgerrits.showwatcher.api_impl;
 
-import nl.larsgerrits.showwatcher.api.eztv.EZTVApi;
-import nl.larsgerrits.showwatcher.api.piratebay.PirateBayApi;
+import nl.larsgerrits.showwatcher.api_impl.eztv.EZTVApi;
+import nl.larsgerrits.showwatcher.api_impl.piratebay.PirateBayApi;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.show.Torrent;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class TorrentCollector
 {
     private static final Map<TVShow, List<Torrent>> showTorrentCache = new HashMap<>();
+    
+//    private static final Predicate<Torrent> t = t -> t.getTitle().toLowerCase().matches("s(\\d\\d)e(\\d\\d)");
     
     public static Torrent getTorrent(TVEpisode episode)
     {
@@ -39,11 +46,19 @@ public class TorrentCollector
         //         }
         //     }
         
+        System.out.println(torrents);
+        
         Optional<Torrent> optionalTorrent = torrents.stream()//
                                                     .filter(torrent -> torrent.getSeason() == episode.getSeason().getSeasonNumber())//
                                                     .filter(torrent -> torrent.getEpisode() == episode.getEpisodeNumber())//
                                                     .max(Comparator.comparing(Torrent::getSeeds));
         
-        return optionalTorrent.orElse(PirateBayApi.request(episode));
+        if (optionalTorrent.isPresent()) return optionalTorrent.get();
+        else
+        {
+            String testId = "s" + String.format("%02d", episode.getSeason().getSeasonNumber()) + "e" + String.format("%02d", episode.getEpisodeNumber());
+            optionalTorrent = torrents.stream().filter(t -> t.getTitle().toLowerCase().contains(testId)).max(Comparator.comparing(Torrent::getSeeds));
+            return optionalTorrent.orElseGet(() -> PirateBayApi.request(episode));
+        }
     }
 }

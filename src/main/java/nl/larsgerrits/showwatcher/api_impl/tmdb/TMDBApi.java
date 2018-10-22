@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api.tmdb;
+package nl.larsgerrits.showwatcher.api_impl.tmdb;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,7 +32,7 @@ public final class TMDBApi
     private static List<TMDBSeason> requestSeasons(TVShow show)
     {
         int tmdbId = IDMapper.getTmdbId(show.getImdbId());
-        String jsonResponse = HTTPUtils.GET("https://api.themoviedb.org/3/tv/" + tmdbId + "?api_key=83fed95ccc330d5b194e5039d40387d6");
+        String jsonResponse = HTTPUtils.get("https://api.themoviedb.org/3/tv/" + tmdbId + "?api_key=83fed95ccc330d5b194e5039d40387d6");
         return seasonGson.fromJson(jsonResponse, List.class);
     }
     
@@ -51,7 +51,7 @@ public final class TMDBApi
     private static List<TMDBEpisode> requestEpisodes(TVSeason season)
     {
         int tmdbId = IDMapper.getTmdbId(season.getTVShow().getImdbId());
-        String jsonResponse = HTTPUtils.GET("https://api.themoviedb.org/3/tv/" + tmdbId + "/season/" + season.getSeasonNumber() + "?api_key=83fed95ccc330d5b194e5039d40387d6");
+        String jsonResponse = HTTPUtils.get("https://api.themoviedb.org/3/tv/" + tmdbId + "/season/" + season.getSeasonNumber() + "?api_key=83fed95ccc330d5b194e5039d40387d6");
         return episodeGson.fromJson(jsonResponse, List.class);
     }
 }

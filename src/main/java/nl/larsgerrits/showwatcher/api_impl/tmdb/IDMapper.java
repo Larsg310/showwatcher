@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api.tmdb;
+package nl.larsgerrits.showwatcher.api_impl.tmdb;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
@@ -38,7 +38,7 @@ public class IDMapper
     @SuppressWarnings("unchecked")
     private static int request(String imdbId)
     {
-        String jsonResponse = HTTPUtils.GET("https://api.themoviedb.org/3/find/" + imdbId + "?api_key=83fed95ccc330d5b194e5039d40387d6&external_source=imdb_id");
+        String jsonResponse = HTTPUtils.get("https://api.themoviedb.org/3/find/" + imdbId + "?api_key=83fed95ccc330d5b194e5039d40387d6&external_source=imdb_id");
         
         if (!Strings.isNullOrEmpty(jsonResponse))
         {

@@ -12,7 +12,7 @@ public final class HTTPUtils
     
     private HTTPUtils() {}
     
-    public static String GET(String url)
+    public static String get(String url)
     {
         try
         {

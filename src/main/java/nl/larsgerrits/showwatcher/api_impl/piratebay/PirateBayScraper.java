@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api.piratebay;
+package nl.larsgerrits.showwatcher.api_impl.piratebay;
 
 import nl.larsgerrits.showwatcher.show.Torrent;
 import org.jsoup.Jsoup;

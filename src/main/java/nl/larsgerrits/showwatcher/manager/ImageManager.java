@@ -5,10 +5,9 @@ import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api.tmdb.IDMapper;
+import nl.larsgerrits.showwatcher.api_impl.tmdb.IDMapper;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVShow;
-import nl.larsgerrits.showwatcher.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -16,8 +15,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
-
-import static nl.larsgerrits.showwatcher.util.FileUtils.*;
 
 public final class ImageManager
 {

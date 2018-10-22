@@ -38,7 +38,7 @@ public class FileUtils
         {
             for (Path path : showPaths)
             {
-                if (Files.exists(path.resolve(Reference.SEASON_INFO)))
+                if (Files.exists(path.resolve(Reference.SEASON_INFO_FILE)))
                 {
                     SeasonData data = parseSeasonData(path);
                     if (data != null)
@@ -82,7 +82,7 @@ public class FileUtils
     {
         try
         {
-            String content = new String(Files.readAllBytes(path.resolve(Reference.SEASON_INFO)));
+            String content = new String(Files.readAllBytes(path.resolve(Reference.SEASON_INFO_FILE)));
             if (!content.isEmpty())
             {
                 return GSON.fromJson(content, SeasonData.class);
@@ -109,7 +109,7 @@ public class FileUtils
         
         if (!dir.exists()) dir.mkdir();
         
-        Path path = dir.toPath().resolve("season_info.json");
+        Path path = dir.toPath().resolve(Reference.SEASON_INFO_FILE);
         try (FileWriter writer = new FileWriter(path.toFile()))
         {
             writer.write(GSON.toJson(data));
@@ -216,7 +216,7 @@ public class FileUtils
     
     public static void writeIdMap(Map<String, Integer> imdbToTmdb)
     {
-        write(Settings.CACHE_PATH.resolve(Reference.ID_MAP), GSON.toJson(imdbToTmdb));
+        write(Settings.CACHE_PATH.resolve(Reference.ID_MAP_FILE), GSON.toJson(imdbToTmdb));
     }
     
     @SuppressWarnings("unchecked")
@@ -224,7 +224,7 @@ public class FileUtils
     {
         try
         {
-            Map<String, Double> jsonMap = GSON.fromJson(Files.lines(Settings.CACHE_PATH.resolve(Reference.ID_MAP), Charset.forName("UTF-8")).collect(Collectors.joining()), Map.class);
+            Map<String, Double> jsonMap = GSON.fromJson(Files.lines(Settings.CACHE_PATH.resolve(Reference.ID_MAP_FILE), Charset.forName("UTF-8")).collect(Collectors.joining()), Map.class);
             for (Map.Entry<String, Double> entry : jsonMap.entrySet())
             {
                 imdbToTmdb.put(entry.getKey(), (int) entry.getValue().doubleValue());

@@ -1,5 +1,7 @@
 package nl.larsgerrits.showwatcher.show;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class Torrent
 {
     private final String title;
@@ -54,5 +56,11 @@ public class Torrent
     public long getSizeInBytes()
     {
         return sizeInBytes;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this).append("title", title).append("season", season).append("episode", episode).toString();
     }
 }

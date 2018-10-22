@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api.eztv;
+package nl.larsgerrits.showwatcher.api_impl.eztv;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,7 +17,7 @@ public final class EZTVApi
     @SuppressWarnings("unchecked")
     public static List<Torrent> request(TVShow show)
     {
-        String jsonResponse = HTTPUtils.GET("https://eztv.ag/api/get-torrents?imdb_id=" + show.getImdbId().replace("tt", ""));
+        String jsonResponse = HTTPUtils.get("https://eztv.ag/api/get-torrents?imdb_id=" + show.getImdbId().replace("tt", ""));
         return gson.fromJson(jsonResponse, List.class);
     }
 }
