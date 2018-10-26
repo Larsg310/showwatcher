@@ -12,6 +12,9 @@ import java.util.Map;
 public final class Settings
 {
     @Nonnull
+    public static Path DEFAULT_PATH;
+    
+    @Nonnull
     public static Path BASE_PATH;
     
     @Nonnull
@@ -20,10 +23,14 @@ public final class Settings
     static
     {
         Path settingsPath = Paths.get(System.getProperty("user.home")).resolve(Reference.SHOW_WATCHER_MAP).resolve(Reference.SETTINGS_FILE);
+        DEFAULT_PATH = Paths.get(System.getProperty("user.home")).resolve(Reference.SHOW_WATCHER_MAP);
+        
+        Path settingsPath = DEFAULT_PATH.resolve(Reference.SETTINGS_FILE);
         Map<String, String> settings = readSettings(settingsPath);
         
         if (settings.containsKey("basePath")) BASE_PATH = Paths.get(settings.get("basePath"));
         else BASE_PATH = Paths.get(System.getProperty("user.home")).resolve(Reference.SHOW_WATCHER_MAP);
+        else BASE_PATH = DEFAULT_PATH;
         
         CACHE_PATH = BASE_PATH.resolve(Reference.CACHE_MAP);
         

@@ -38,6 +38,7 @@ public class Main extends Application
     
     public static void main(String[] args)
     {
+        Natives.loadNatives();
         launch(args);
     }
 }
