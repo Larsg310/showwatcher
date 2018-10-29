@@ -2,6 +2,7 @@ package nl.larsgerrits.showwatcher.api_impl.eztv;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import nl.larsgerrits.showwatcher.gson.EZTVDeserializer;
 import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.show.Torrent;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;

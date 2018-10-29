@@ -3,6 +3,7 @@ package nl.larsgerrits.showwatcher.api_impl.tmdb;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import nl.larsgerrits.showwatcher.gson.TMDBFindDeserializer;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;
 
@@ -21,7 +22,7 @@ public class IDMapper
     
     public static void close()
     {
-        FileUtils.writeIdMap(imdbToTmdb);
+        FileUtils.saveIdMap(imdbToTmdb);
     }
     
     public static int getTmdbId(String imdbId)

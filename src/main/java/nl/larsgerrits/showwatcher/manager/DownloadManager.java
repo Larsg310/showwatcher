@@ -46,27 +46,13 @@ public final class DownloadManager
         Threading.DOWNLOAD_THREAD.execute(() -> {
             Torrent torrent = TorrentCollector.getTorrent(episode);
             
-            // String magnetUrl = torrent.getMagnetUrl();
-            // System.out.println(magnetUrl);
-            //
-            // int dnIndex = magnetUrl.indexOf("&dn");
-            // int nIndex = magnetUrl.indexOf("&", dnIndex + 3);
-            //
-            // String from = magnetUrl.substring(dnIndex, nIndex);
-            // String to = "&dn=episode_" + String.format("%02d", episode.getEpisodeNumber()) + "_" + FileUtils.getSimplefiedName(episode.getTitle());
-            //
-            // System.out.println(from);
-            // System.out.println(to);
-            
             System.out.println(torrent);
             if (torrent != null)
             {
-                Download download = downloadMagnet(episode, /*magnetUrl.replace(from, to)*/torrent.getMagnetUrl());
+                Download download = downloadMagnet(episode, torrent.getMagnetUrl());
                 if (downloadAddedCallback != null) Platform.runLater(() -> downloadAddedCallback.accept(download));
             }
         });
-        
-        // System.out.println();
     }
     
     private static Download downloadMagnet(TVEpisode episode, String magnetUrl)

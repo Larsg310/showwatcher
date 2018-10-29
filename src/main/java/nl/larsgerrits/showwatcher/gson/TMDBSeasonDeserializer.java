@@ -1,6 +1,7 @@
-package nl.larsgerrits.showwatcher.api_impl.tmdb;
+package nl.larsgerrits.showwatcher.gson;
 
 import com.google.gson.*;
+import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBSeason;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;

@@ -6,20 +6,19 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import nl.larsgerrits.showwatcher.components.TabDownload?>
-<?import nl.larsgerrits.showwatcher.components.TabUnwatched?>
+<?import nl.larsgerrits.showwatcher.components.TabCollections?>
 <JFXTabPane xmlns:fx="http://javafx.com/fxml"
             prefHeight="1000.0"
             prefWidth="1784.0"
-            stylesheets="@../css/stylesheet.css"
             xmlns="http://javafx.com/javafx"
             fx:id="tabPane"
             fx:controller="nl.larsgerrits.showwatcher.controller.MainController">
     <TabDownload closable="false">
     
     </TabDownload>
-    <TabUnwatched>
+    <TabCollections>
     
-    </TabUnwatched>
+    </TabCollections>
     <Tab closable="false"
          id="show-tab"
          text="My Shows">

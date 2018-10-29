@@ -1,0 +1,52 @@
+* {
+    -fx-primary: #FAFAFA;
+    -fx-secondary: #FFFFFF;
+    -fx-primary-text: #B2B2B2;
+}
+
+.scroll-pane, .anchor-pane {
+    -fx-background-color: -fx-primary;
+    -fx-background: -fx-primary;
+}
+
+.jfx-rippler {
+    -jfx-rippler-fill: -fx-secondary;
+}
+
+#button {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: -fx-primary-text;
+    -jfx-rippler-fill: -fx-primary;
+    -jfx-button-type: RAISED;
+}
+
+#poster , #bordered{
+    -fx-border-color: -fx-secondary;
+    -fx-border-width: 2px;
+    -fx-border-radius: 3px;
+    -fx-border-style: solid;
+}
+
+#poster:hover {
+    -fx-background-color: -fx-secondary;
+}
+
+#show-tab {
+    /*-fx-pref-width: 223;*/
+}
+
+.tab {
+    -fx-background-color: -fx-primary;
+}
+
+.tab-label {
+    -fx-text-fill: -fx-primary-text;
+}
+
+.tab-header-background, .jfx-tab-pane .headers-region .tab-selected-line {
+    -fx-background-color: -fx-primary;
+}
+
+.glyph-icon, #text {
+    -fx-fill: -fx-primary-text;
+}

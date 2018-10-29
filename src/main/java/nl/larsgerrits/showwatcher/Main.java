@@ -28,7 +28,7 @@ public class Main extends Application
         
         Scene scene = new Scene(loader.load());
         
-        scene.getStylesheets().add(getClass().getResource("/css/stylesheet.css").toString());
+        scene.getStylesheets().add(getClass().getResource("/css/dark_theme.css").toString());
         
         stage.setScene(scene);
         stage.setTitle("Show Watcher");

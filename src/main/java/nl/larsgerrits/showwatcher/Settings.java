@@ -20,19 +20,21 @@ public final class Settings
     @Nonnull
     public static Path CACHE_PATH;
     
+    @Nonnull
+    public static Path COLLECTIONS_PATH;
+    
     static
     {
-        Path settingsPath = Paths.get(System.getProperty("user.home")).resolve(Reference.SHOW_WATCHER_MAP).resolve(Reference.SETTINGS_FILE);
         DEFAULT_PATH = Paths.get(System.getProperty("user.home")).resolve(Reference.SHOW_WATCHER_MAP);
         
         Path settingsPath = DEFAULT_PATH.resolve(Reference.SETTINGS_FILE);
         Map<String, String> settings = readSettings(settingsPath);
         
         if (settings.containsKey("basePath")) BASE_PATH = Paths.get(settings.get("basePath"));
-        else BASE_PATH = Paths.get(System.getProperty("user.home")).resolve(Reference.SHOW_WATCHER_MAP);
         else BASE_PATH = DEFAULT_PATH;
         
         CACHE_PATH = BASE_PATH.resolve(Reference.CACHE_MAP);
+        COLLECTIONS_PATH = BASE_PATH.resolve(Reference.COLLECTIONS_MAP);
         
         System.out.println(BASE_PATH);
         //        System.out.println(System.getProperty("user.home"));

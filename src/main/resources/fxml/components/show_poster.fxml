@@ -24,7 +24,7 @@
           textAlignment="CENTER"
           wrappingWidth="130" />
     <AnchorPane fx:id="layer"
-                stylesheets="@../../css/stylesheet.css"
+                stylesheets="@../../css/dark_theme.css"
                 AnchorPane.bottomAnchor="0"
                 AnchorPane.leftAnchor="0"
                 AnchorPane.rightAnchor="0"

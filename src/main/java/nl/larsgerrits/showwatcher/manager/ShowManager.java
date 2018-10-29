@@ -11,8 +11,15 @@ import nl.larsgerrits.showwatcher.show.TVSeason;
 import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class ShowManager
 {
@@ -32,6 +39,15 @@ public final class ShowManager
         return tvShows;
     }
     
+    public static Map<String, TVShow> getTVShowMap()
+    {
+        if (tvShowMap.isEmpty())
+        {
+            FileUtils.loadShowsFromDisk(ShowManager::onSeasonDataLoad);
+        }
+        return tvShowMap;
+    }
+    
     private static TVSeason onSeasonDataLoad(Path path, SeasonData seasonData)
     {
         TVShow show = tvShowMap.get(seasonData.getImdbId());
@@ -40,6 +56,7 @@ public final class ShowManager
             show = new TVShow(seasonData.getTitle(), seasonData.getImdbId());
             tvShowMap.put(seasonData.getImdbId(), show);
             tvShows.add(show);
+            tvShows.sort(Comparator.comparing(TVShow::getTitle));
         }
         
         TVSeason season = new TVSeason(show, seasonData.getSeason(), path, seasonData.getTotalEpisodes(), seasonData.getReleaseDate());
@@ -51,15 +68,15 @@ public final class ShowManager
                 TVEpisode episode = new TVEpisode(episodeData.getTitle(), episodeData.getEpisode(), episodeData.getFileName(), date, season, episodeData.isWatched());
                 season.addEpisode(episode, false);
             }
-            show.addSeason(season, false);
+            //            System.out.println(season.getTVShow().getTitle() + ": " + season.getSeasonNumber());
         }
-        
+        show.addSeason(season, false);
         return season;
     }
     
     public static void checkForNewUpdates(TVShow show)
     {
-        Threading.API_THREAD.execute(() -> {
+        Threading.LOADING_THREAD.execute(() -> {
             List<TMDBSeason> tmdbSeasons = TMDBApi.getSeasons(show);
             for (TMDBSeason season : tmdbSeasons)
             {
@@ -112,8 +129,22 @@ public final class ShowManager
                .forEach(ShowManager::saveSeasonToDisk);
     }
     
+    @Nullable
     public static TVShow getShow(String imdbId)
     {
-        return getTVShows().stream().filter(show -> show.getImdbId().equals(imdbId)).findFirst().orElse(null);
+        
+        return getTVShowMap().get(imdbId);
+    }
+    
+    @Nonnull
+    public static List<TVShow> getShows(String... imdbIds)
+    {
+        List<TVShow> shows = new ArrayList<>();
+        for (String imdbId : imdbIds)
+        {
+            TVShow show = getTVShowMap().get(imdbId);
+            if (show != null) shows.add(show);
+        }
+        return shows;
     }
 }

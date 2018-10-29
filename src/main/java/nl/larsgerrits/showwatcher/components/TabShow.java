@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Date;
 
 public class TabShow extends Tab
@@ -47,7 +48,6 @@ public class TabShow extends Tab
     {
         this.show = show;
         this.showTabPane = showTabPane;
-        show.setSeasonAdded(this::newSeasonAdded);
         
         setText(show.getTitle());
         setClosable(true);
@@ -114,8 +114,11 @@ public class TabShow extends Tab
         for (TVSeason season : show.getSeasons())
         {
             TabSeason tab = new TabSeason(season, this::onEpisodeSelected);
+            System.out.println(season.getSeasonNumber());
             seasonTabPane.getTabs().add(tab);
         }
+        seasonTabPane.getTabs().sort(Comparator.comparing(t -> ((TabSeason) t).getSeason().getSeasonNumber()));
+        show.setSeasonAdded(this::newSeasonAdded);
         
         borderPane.setCenter(seasonTabPane);
         
@@ -259,7 +262,10 @@ public class TabShow extends Tab
     private void newSeasonAdded(TVSeason season)
     {
         TabSeason tab = new TabSeason(season, this::onEpisodeSelected);
-        Platform.runLater(() -> seasonTabPane.getTabs().add(tab));
+        Platform.runLater(() -> {
+            seasonTabPane.getTabs().add(tab);
+            seasonTabPane.getTabs().sort(Comparator.comparing(t -> ((TabSeason) t).getSeason().getSeasonNumber()));
+        });
     }
     
     @SuppressWarnings("deprecation")

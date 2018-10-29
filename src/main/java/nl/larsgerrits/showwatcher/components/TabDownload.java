@@ -27,7 +27,7 @@ public class TabDownload extends Tab
         
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setPrefHeight(1000);
+//        scrollPane.setPrefHeight(1000);
         scrollPane.setLayoutX(10);
         scrollPane.setLayoutY(40);
         scrollPane.setFitToWidth(true);

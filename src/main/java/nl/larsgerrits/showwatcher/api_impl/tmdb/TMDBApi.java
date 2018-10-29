@@ -2,6 +2,8 @@ package nl.larsgerrits.showwatcher.api_impl.tmdb;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import nl.larsgerrits.showwatcher.gson.TMDBEpisodeDeserializer;
+import nl.larsgerrits.showwatcher.gson.TMDBSeasonDeserializer;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;

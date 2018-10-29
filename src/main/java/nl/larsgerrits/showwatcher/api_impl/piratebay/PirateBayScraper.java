@@ -30,9 +30,9 @@ public class PirateBayScraper
                 if (!element.hasClass("header"))
                 {
                     Element td2 = element.children().select("td").get(1);
-                    Element aTorrentName = td2.children().select("a").first();
+                    Element torrentName = td2.children().select("a").first();
                     
-                    String name = aTorrentName.text();
+                    String name = torrentName.text();
                     
                     Element torrentMagnet = td2.children().select("a").get(1);
                     String magnetUrl = torrentMagnet.attr("href");
@@ -40,7 +40,7 @@ public class PirateBayScraper
                     Element details = td2.select("font").first();
                     String torrentInfo = details.text();
                     String[] splitInfo = torrentInfo.split(",");
-                    String size = splitInfo[1].substring(6);
+//                    String size = splitInfo[1].substring(6); (e.g. 2.16GiB)
                     
                     Element td3 = element.children().select("td").get(2);
                     int seeds = Integer.parseInt(td3.text());

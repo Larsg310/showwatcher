@@ -8,4 +8,5 @@ public class Reference
     
     public static final String SHOW_WATCHER_MAP = "showwatcher";
     public static final String CACHE_MAP = "_cache";
+    public static final String COLLECTIONS_MAP = "_collections";
 }
