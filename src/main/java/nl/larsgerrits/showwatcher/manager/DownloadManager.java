@@ -3,11 +3,7 @@ package nl.larsgerrits.showwatcher.manager;
 import com.frostwire.jlibtorrent.AlertListener;
 import com.frostwire.jlibtorrent.SessionManager;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.alerts.AddTorrentAlert;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
+import com.frostwire.jlibtorrent.alerts.*;
 import javafx.application.Platform;
 import nl.larsgerrits.showwatcher.Threading;
 import nl.larsgerrits.showwatcher.api_impl.TorrentCollector;
@@ -43,14 +39,21 @@ public final class DownloadManager
     
     public static void downloadEpisode(TVEpisode episode)
     {
+        // downloadQueue.add(episode);
         Threading.DOWNLOAD_THREAD.execute(() -> {
             Torrent torrent = TorrentCollector.getTorrent(episode);
             
-            System.out.println(torrent);
+            String info = String.format("%s Episode %dx%02d", episode.getSeason().getShow().getTitle(), episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber());
             if (torrent != null)
             {
+                System.out.println("Downloading " + info);
                 Download download = downloadMagnet(episode, torrent.getMagnetUrl());
                 if (downloadAddedCallback != null) Platform.runLater(() -> downloadAddedCallback.accept(download));
+            }
+            else
+            {
+                System.out.println("Failed downloading " + info);
+                downloadFinishedCallback.accept(null);
             }
         });
     }
@@ -90,7 +93,7 @@ public final class DownloadManager
                         case TORRENT_FINISHED:
                             ((TorrentFinishedAlert) alert).handle().pause();
                             // System.out.println("Finished download!" + (fileName));
-                            episode.setFileName(fileName);
+                            episode.setVideoFile(episode.getSeason().getPath().resolve(fileName));
                             if (downloadFinishedCallback != null) Platform.runLater(() -> downloadFinishedCallback.accept(download));
                             break;
                         case BLOCK_FINISHED:

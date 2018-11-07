@@ -1,5 +1,7 @@
 package nl.larsgerrits.showwatcher;
 
+import nl.larsgerrits.showwatcher.util.FileUtils;
+
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -44,13 +46,19 @@ public final class Settings
     
     private static Map<String, String> readSettings(Path path)
     {
-        
         Map<String, String> settings = new HashMap<>();
-        try
+        if (Files.exists(path))
         {
-            Files.lines(path, Charset.forName("UTF-8")).filter(s -> !s.trim().startsWith("#")).forEach(s -> parseLineToSettings(s, settings));
+            try
+            {
+                Files.lines(path, Charset.forName("UTF-8")).filter(s -> !s.trim().startsWith("#")).forEach(s -> parseLineToSettings(s, settings));
+            }
+            catch (IOException e) { e.printStackTrace();}
         }
-        catch (IOException ignored) { }
+        else
+        {
+            if (Files.notExists(path)) FileUtils.write(path, "basePath=" + Settings.DEFAULT_PATH);
+        }
         return settings;
     }
     

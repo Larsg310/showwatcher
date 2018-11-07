@@ -38,9 +38,7 @@ public class PosterShow extends AnchorPane
     public void initialize()
     {
         text.setText(show.getTitle());
-        Image image = new Image(ImageManager.getPosterURLForTVShow(show, this::onDownloadImage));
-        imageView.setImage(image);
-        
+        ImageManager.getPosterURLForTVShow(show, imageView::setImage);
         // TabShow controller = new TabShow(show);
     }
     

@@ -20,7 +20,7 @@ public class Download extends AnchorPane
         setPrefHeight(70);
         setPrefWidth(200);
         
-        Text text = new Text(episode.getSeason().getTVShow().getTitle() + " " + episode.getSeason().getSeasonNumber() + "x" + episode.getEpisodeNumber());
+        Text text = new Text(episode.getSeason().getShow().getTitle() + " " + episode.getSeason().getSeasonNumber() + "x" + episode.getEpisodeNumber());
         text.setFont(new Font(20));
         text.setId("text");
         AnchorPane.setTopAnchor(text, 4D);

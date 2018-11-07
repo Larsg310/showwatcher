@@ -1,19 +1,20 @@
-package nl.larsgerrits.showwatcher.api_impl.tmdb;
+package nl.larsgerrits.showwatcher.api_impl.trakt;
 
 import java.util.Date;
 
-public class TMDBEpisode
+public class TraktEpisode
 {
     private String title;
     private int episodeNumber;
     private Date releaseDate;
-    // public String overview;
+    public String overview;
     
-    public TMDBEpisode(String title, int episodeNumber, Date releaseDate)
+    public TraktEpisode(String title, int episodeNumber, Date releaseDate, String overview)
     {
         this.title = title;
         this.episodeNumber = episodeNumber;
         this.releaseDate = releaseDate;
+        this.overview = overview;
     }
     
     public int getEpisodeNumber()
@@ -29,5 +30,10 @@ public class TMDBEpisode
     public String getTitle()
     {
         return title;
+    }
+    
+    public String getOverview()
+    {
+        return overview;
     }
 }

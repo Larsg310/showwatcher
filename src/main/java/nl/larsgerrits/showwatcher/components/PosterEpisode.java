@@ -1,6 +1,5 @@
 package nl.larsgerrits.showwatcher.components;
 
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -44,14 +43,14 @@ public class PosterEpisode extends AnchorPane
         imageView.setPreserveRatio(true);
         
         setOnMouseClicked(e -> onClicked());
-        setImage(new Image(ImageManager.getPosterURLForTVEpisode(episode, this::onDownloadImage)));
+        ImageManager.getPosterURLForTVEpisode(episode, this::setImage);
         
-        if (episode.isWatched())
-        {
-            ColorAdjust effect = new ColorAdjust();
-            effect.setSaturation(-1D);
-            imageView.setEffect(effect);
-        }
+        // if (episode.isWatched())
+        // {
+        //     ColorAdjust effect = new ColorAdjust();
+        //     effect.setSaturation(-1D);
+        //     imageView.setEffect(effect);
+        // }
         
         setLeftAnchor(imageView, 10D);
         setRightAnchor(imageView, 10D);
@@ -65,24 +64,14 @@ public class PosterEpisode extends AnchorPane
         if (episodeChangeListener != null) episodeChangeListener.accept(episode);
     }
     
-    private void setImage(Image image)
-    {
-        imageView.setImage(image);
-        imageHeight = 188 * (image.getHeight() / image.getWidth());
-        text.setLayoutY(10 + 16 + imageHeight);
-        
-        setPrefHeight(18 + imageHeight + text.getLayoutBounds().getHeight());
-        
-    }
-    
     // public void initialize()
     // {
     // setOnMouseClicked(e -> {
     //     try
     //     {
-    //         if (StringUtils.isNotEmpty(episode.getFileName()) && episode.getSeason().getPath() != null)
+    //         if (StringUtils.isNotEmpty(episode.getVideoFile()) && episode.getSeason().getPath() != null)
     //         {
-    //             Desktop.getDesktop().open(episode.getSeason().getPath().resolve(episode.getFileName()).toFile());
+    //             Desktop.getDesktop().open(episode.getSeason().getPath().resolve(episode.getVideoFile()).toFile());
     //         }
     //     }
     //     catch (IOException e1)
@@ -92,10 +81,14 @@ public class PosterEpisode extends AnchorPane
     // });
     // }
     
-    public void onDownloadImage(String url)
+    private void setImage(Image image)
     {
-        Image image = new Image(url);
-        setImage(image);
+        imageView.setImage(image);
+        imageHeight = 188 * (image.getHeight() / image.getWidth());
+        text.setLayoutY(26 + imageHeight);
+        
+        setPrefHeight(18 + imageHeight + text.getLayoutBounds().getHeight());
+        
     }
     
     public TVEpisode getEpisode()

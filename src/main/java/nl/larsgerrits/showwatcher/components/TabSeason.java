@@ -58,8 +58,8 @@ public class TabSeason extends Tab
             {
                 masonryPane.getChildren().forEach(n -> ((PosterEpisode) n).setPrefHeight(poster.getPrefHeight()));
                 masonryPane.setCellHeight(poster.getPrefHeight());
-                masonryPane.getChildren().add(poster);
             }
+            Platform.runLater(() -> masonryPane.getChildren().add(poster));
         }
     }
     
@@ -71,7 +71,7 @@ public class TabSeason extends Tab
             {
                 Threading.LOADING_THREAD.execute(() -> {
                     List<PosterEpisode> posters = new ArrayList<>();
-                    
+
                     for (TVEpisode episode : season.getEpisodes())
                     {
                         PosterEpisode poster = new PosterEpisode(episode, episodeSelectedConsumer);
@@ -84,16 +84,10 @@ public class TabSeason extends Tab
                 });
             }
         }
-        
     }
     
     public TVSeason getSeason()
     {
         return season;
-    }
-    
-    public boolean isEmpty()
-    {
-        return masonryPane.getChildren().isEmpty();
     }
 }

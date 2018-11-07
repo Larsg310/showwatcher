@@ -5,10 +5,8 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.control.Tab;
 import nl.larsgerrits.showwatcher.manager.ShowCollectionManager;
 import nl.larsgerrits.showwatcher.show.ShowCollection;
-import nl.larsgerrits.showwatcher.show.TVEpisode;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TabCollections extends Tab
 {
@@ -19,19 +17,19 @@ public class TabCollections extends Tab
         setGraphic(FOLDER);
         
         List<ShowCollection> collections = ShowCollectionManager.getShowCollection();
-        ShowCollection collection = collections.get(0);
-
-        long currentTime = System.currentTimeMillis();
-        List<TVEpisode> episodes = collection.getShows()//
-                                             .stream()//
-                                             .flatMap(s -> s.getSeasons().stream())//
-                                             .flatMap(s -> s.getEpisodes().stream())//
-                                             .filter(e -> e.getReleaseDate().getTime() < currentTime)
-//                                             .filter(e -> !e.isWatched())//
-//                                             .sorted(Compa)
-                                             .collect(Collectors.toList());
-        
-        System.out.println();
+//         ShowCollection collection = collections.get(0);
+//
+//         long currentTime = System.currentTimeMillis();
+//         List<TVEpisode> episodes = collection.getShows()//
+//                                              .stream()//
+//                                              .flatMap(s -> s.getSeasons().stream())//
+//                                              .flatMap(s -> s.getEpisodes().stream())//
+//                                              .filter(e -> e.getReleaseDate().getTime() < currentTime)
+// //                                             .filter(e -> !e.isWatched())//
+// //                                             .sorted(Compa)
+//                                              .collect(Collectors.toList());
+//
+//         System.out.println();
         // TVShow show = ShowManager.getShow("tt2357547");
         
         // if (show != null)
@@ -59,7 +57,7 @@ public class TabCollections extends Tab
         //                {
         //                    for (TVEpisode episode : season)
         //                    {
-        //                        if (episode.getFileName().isEmpty() && episode.getReleaseDate().getTime() != 0 && episode.getReleaseDate().getTime() < System.currentTimeMillis())
+        //                        if (episode.getVideoFile().isEmpty() && episode.getReleaseDate().getTime() != 0 && episode.getReleaseDate().getTime() < System.currentTimeMillis())
         //                        {
         //                            System.out.println(show.getTitle() + ": " + season.getSeasonNumber() + "x" + String.format("%02d", episode.getEpisodeNumber()));
         //                            // DownloadManager.downloadEpisode(episode);

@@ -12,7 +12,14 @@ public class Torrent
     private final int peers;
     private final long sizeInBytes;
     
+    private final Object data;
+    
     public Torrent(String title, String magnetUrl, int season, int episode, int seeds, int peers, long sizeInBytes)
+    {
+        this(title, magnetUrl, season, episode, seeds, peers, sizeInBytes, null);
+    }
+    
+    public Torrent(String title, String magnetUrl, int season, int episode, int seeds, int peers, long sizeInBytes, Object data)
     {
         this.title = title;
         this.magnetUrl = magnetUrl;
@@ -21,6 +28,12 @@ public class Torrent
         this.seeds = seeds;
         this.peers = peers;
         this.sizeInBytes = sizeInBytes;
+        this.data = data;
+    }
+    
+    public Object getData()
+    {
+        return data;
     }
     
     public int getEpisode()
@@ -48,14 +61,14 @@ public class Torrent
         return seeds;
     }
     
-    public String getTitle()
-    {
-        return title;
-    }
-    
     public long getSizeInBytes()
     {
         return sizeInBytes;
+    }
+    
+    public String getTitle()
+    {
+        return title;
     }
     
     @Override

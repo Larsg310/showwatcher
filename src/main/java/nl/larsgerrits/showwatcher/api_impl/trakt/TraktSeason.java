@@ -1,14 +1,14 @@
-package nl.larsgerrits.showwatcher.api_impl.tmdb;
+package nl.larsgerrits.showwatcher.api_impl.trakt;
 
 import java.util.Date;
 
-public class TMDBSeason
+public class TraktSeason
 {
     private int seasonNumber;
     private int episodeCount;
     private Date releaseDate;
     
-    public TMDBSeason(int seasonNumber, int episodeCount, Date releaseDate)
+    public TraktSeason(int seasonNumber, int episodeCount, Date releaseDate)
     {
         this.seasonNumber = seasonNumber;
         this.episodeCount = episodeCount;

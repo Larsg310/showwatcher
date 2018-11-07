@@ -1,9 +1,10 @@
 package nl.larsgerrits.showwatcher.manager;
 
+import com.google.common.base.Strings;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBApi;
-import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBEpisode;
-import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBSeason;
+import nl.larsgerrits.showwatcher.api_impl.trakt.TraktApi;
+import nl.larsgerrits.showwatcher.api_impl.trakt.TraktEpisode;
+import nl.larsgerrits.showwatcher.api_impl.trakt.TraktSeason;
 import nl.larsgerrits.showwatcher.data.EpisodeData;
 import nl.larsgerrits.showwatcher.data.SeasonData;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
@@ -14,12 +15,7 @@ import nl.larsgerrits.showwatcher.util.FileUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class ShowManager
 {
@@ -65,10 +61,10 @@ public final class ShowManager
             for (EpisodeData episodeData : seasonData.getEpisodeData())
             {
                 Date date = new Date(episodeData.getReleaseDate());
-                TVEpisode episode = new TVEpisode(episodeData.getTitle(), episodeData.getEpisode(), episodeData.getFileName(), date, season, episodeData.isWatched());
+                TVEpisode episode = new TVEpisode(episodeData.getTitle(), episodeData.getEpisode(), Strings.isNullOrEmpty(episodeData.getFileName()) ? null : path.resolve(episodeData.getFileName()), date, season, episodeData.isWatched());
                 season.addEpisode(episode, false);
             }
-            //            System.out.println(season.getTVShow().getTitle() + ": " + season.getSeasonNumber());
+            //            System.out.println(season.getShow().getTitle() + ": " + season.getSeasonNumber());
         }
         show.addSeason(season, false);
         return season;
@@ -76,9 +72,9 @@ public final class ShowManager
     
     public static void checkForNewUpdates(TVShow show)
     {
-        Threading.LOADING_THREAD.execute(() -> {
-            List<TMDBSeason> tmdbSeasons = TMDBApi.getSeasons(show);
-            for (TMDBSeason season : tmdbSeasons)
+        Threading.API_THREAD.execute(() -> {
+            List<TraktSeason> tmdbSeasons = TraktApi.getSeasons(show);
+            for (TraktSeason season : tmdbSeasons)
             {
                 if (season.getSeasonNumber() != 0)
                 {
@@ -101,13 +97,18 @@ public final class ShowManager
             {
                 if (!season.isFullyDownloaded())
                 {
-                    List<TMDBEpisode> tmdbEpisodes = TMDBApi.getEpisodes(season);
-                    for (TMDBEpisode episode : tmdbEpisodes)
+                    List<TraktEpisode> tmdbEpisodes = TraktApi.getEpisodes(season);
+                    for (TraktEpisode episode : tmdbEpisodes)
                     {
                         if (!season.hasEpisode(episode.getEpisodeNumber()))
                         {
-                            TVEpisode tvEpisode = new TVEpisode(episode.getTitle(), episode.getEpisodeNumber(), "", episode.getReleaseDate(), season, false);
+                            TVEpisode tvEpisode = new TVEpisode(episode.getTitle(), episode.getEpisodeNumber(), null, episode.getReleaseDate(), season, false);
                             season.addEpisode(tvEpisode, true);
+                            season.setDirty(true);
+                        }
+                        else
+                        {
+                            season.getEpisode(episode.getEpisodeNumber()).setReleaseDate(episode.getReleaseDate());
                         }
                     }
                 }

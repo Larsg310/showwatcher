@@ -1,7 +1,6 @@
 package nl.larsgerrits.showwatcher.show;
 
 import com.google.common.base.Objects;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
@@ -54,6 +53,11 @@ public class TVSeason implements Iterable<TVEpisode>
         return episodes.stream().anyMatch(episode -> episode.getEpisodeNumber() == number);
     }
     
+    public TVEpisode getEpisode(int number)
+    {
+        return episodes.stream().filter(episode -> episode.getEpisodeNumber() == number).findFirst().orElse(null);
+    }
+    
     @Override
     @Nonnull
     public Iterator<TVEpisode> iterator()
@@ -86,7 +90,7 @@ public class TVSeason implements Iterable<TVEpisode>
         return seasonNumber;
     }
     
-    public TVShow getTVShow()
+    public TVShow getShow()
     {
         return show;
     }
@@ -109,7 +113,7 @@ public class TVSeason implements Iterable<TVEpisode>
     public boolean isFullyDownloaded()
     {
         if (episodes.isEmpty()) return false;
-        return episodes.stream().allMatch(episode -> StringUtils.isNotEmpty(episode.getFileName()));
+        return episodes.stream().allMatch(episode -> episode.getVideoFile() != null);
     }
     
     public boolean isWatched()

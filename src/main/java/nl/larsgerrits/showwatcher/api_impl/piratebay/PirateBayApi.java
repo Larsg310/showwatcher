@@ -9,20 +9,18 @@ import java.util.List;
 public final class PirateBayApi
 {
     private PirateBayApi() {}
-    
+
     @SuppressWarnings("unchecked")
-    public static Torrent request(TVEpisode e)
+    public static List<Torrent> request(TVEpisode e)
     {
         Query query = constructQuery(e);
-        System.out.println(query.TranslateToUrl());
-        List<Torrent> torrents = PirateBayScraper.search(query, e.getSeason().getSeasonNumber(), e.getEpisodeNumber());
-        if (torrents.size() > 0) return torrents.get(0);
-        return null;
+        System.out.println("URL: "+query.TranslateToUrl());
+        return PirateBayScraper.search(query, e.getSeason().getSeasonNumber(), e.getEpisodeNumber());
     }
-    
+
     private static Query constructQuery(TVEpisode episode)
     {
-        return new Query(FileUtils.getSimplifiedName(episode.getSeason().getTVShow().getTitle()).replace("_", "%20") + "%20s" + String.format("%02d", episode.getSeason().getSeasonNumber()) + "e" + String.format("%02d", episode.getEpisodeNumber()), 0);
+        return new Query(FileUtils.getSimplifiedName(episode.getSeason().getShow().getTitle()).replace("_", "%20") + "%20s" + String.format("%02d", episode.getSeason().getSeasonNumber()) + "e*" + episode.getEpisodeNumber(), 0);
     }
-    
+
 }

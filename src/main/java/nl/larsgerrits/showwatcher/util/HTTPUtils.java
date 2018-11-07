@@ -1,10 +1,19 @@
 package nl.larsgerrits.showwatcher.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import nl.larsgerrits.showwatcher.Settings;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 
 public final class HTTPUtils
 {
@@ -14,15 +23,20 @@ public final class HTTPUtils
     
     public static String get(String url)
     {
+        return get(url, null);
+    }
+    
+    public static String get(String url, Map<String, String> headers)
+    {
         try
         {
-            HttpURLConnection con = getConnection(url);
+            HttpURLConnection con = getConnection(url, headers);
             if (con.getResponseCode() == RATE_LIMIT_RESPONSE)
             {
                 int retryAfter = Integer.valueOf(con.getHeaderField("Retry-After"));
                 con.disconnect();
                 Thread.sleep(retryAfter * 1000 + 1000);
-                con = getConnection(url);
+                con = getConnection(url, headers);
             }
             
             if (con.getResponseCode() == HttpURLConnection.HTTP_OK)
@@ -42,12 +56,96 @@ public final class HTTPUtils
         return "";
     }
     
-    private static HttpURLConnection getConnection(String url) throws IOException
+    public static Stream<String> getFromZip(String urlString)
+    {
+        try
+        {
+            Path path = Settings.CACHE_PATH.resolve("_ettv.txt");
+            
+            if (Files.notExists(path))
+            {
+                HttpURLConnection con = getConnection(urlString, null);
+                
+                ReadableByteChannel rbc = Channels.newChannel(con.getInputStream());
+                
+                Path gzipPath = Settings.CACHE_PATH.resolve("_ettv.txt.gz");
+                
+                FileOutputStream fos = new FileOutputStream(gzipPath.toFile());
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                fos.close();
+                rbc.close();
+                
+                FileInputStream fis = new FileInputStream(gzipPath.toFile());
+                GZIPInputStream gis = new GZIPInputStream(fis);
+                ReadableByteChannel in = Channels.newChannel(gis);
+                
+                WritableByteChannel out = Channels.newChannel(new FileOutputStream(path.toFile()));
+                ByteBuffer buffer = ByteBuffer.allocate(65536);
+                while (in.read(buffer) != -1)
+                {
+                    buffer.flip();
+                    out.write(buffer);
+                    buffer.clear();
+                }
+                
+                out.close();
+                in.close();
+                gis.close();
+                fis.close();
+                
+                Files.delete(gzipPath);
+                
+                // FileUtils.write(path, Files.lines(path).filter(filter).collect(Collectors.joining("\n")));
+            }
+            
+            return Files.lines(path);
+            // URI zipUri = URI.create(url);
+            //
+            // Map<String, Object> env = new HashMap<>();
+            // env.put("create", "true");
+            // FileSystem zipFS = FileSystems.newFileSystem(zipUri, env, null);
+            //
+            // Path txtPath = zipFS.getPath("ettv_full.txt");
+            // Files.lines(txtPath, UTF_8).forEach(System.out::println);
+            
+            // HttpURLConnection con = getConnection(url);
+            // StringBuilder response = new StringBuilder();
+            //
+            // GZIPInputStream gzip = new GZIPInputStream(con.getInputStream());
+            // BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
+            // String line;
+            // while ((line = br.readLine()) != null)
+            // {
+            //     System.out.println(line);
+            //     response.append(line).append("\n");
+            // }
+            // //
+            // // System.out.println(con.getJarFile().getName());
+            //
+            // // BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            // // String inputLine;
+            // //
+            // // while ((inputLine = in.readLine()) != null) response.append(inputLine);
+            // // in.close();
+            //
+            // return response.toString();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return Stream.of();
+    }
+    
+    private static HttpURLConnection getConnection(String url, Map<String, String> headers) throws IOException
     {
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        
+        if (headers != null) headers.forEach(con::setRequestProperty);
+        
         con.connect();
         return con;
     }

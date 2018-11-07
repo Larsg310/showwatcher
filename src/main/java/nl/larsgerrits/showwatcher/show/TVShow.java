@@ -55,7 +55,7 @@ public class TVShow implements Iterable<TVSeason>
     //     return seasons.stream()//
     //                   .filter(season -> season.getSeasonNumber() == number)//
     //                   .flatMap(season -> season.getEpisodes().stream())//
-    //                   .anyMatch(episode -> StringUtils.isEmpty(episode.getFileName()));
+    //                   .anyMatch(episode -> StringUtils.isEmpty(episode.getVideoFile()));
     // }
     
     public void setWatched(boolean watched)

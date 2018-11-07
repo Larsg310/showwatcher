@@ -40,7 +40,7 @@ public class PirateBayScraper
                     Element details = td2.select("font").first();
                     String torrentInfo = details.text();
                     String[] splitInfo = torrentInfo.split(",");
-//                    String size = splitInfo[1].substring(6); (e.g. 2.16GiB)
+                    //                    String size = splitInfo[1].substring(6); (e.g. 2.16GiB)
                     
                     Element td3 = element.children().select("td").get(2);
                     int seeds = Integer.parseInt(td3.text());

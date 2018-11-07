@@ -9,6 +9,10 @@
     -fx-background: -fx-primary;
 }
 
+.anchor-pane-2 {
+    -fx-background-color: #4a2E37;
+}
+
 .jfx-rippler {
     -jfx-rippler-fill: -fx-secondary;
 }
@@ -20,7 +24,7 @@
     -jfx-button-type: RAISED;
 }
 
-#poster , #bordered{
+#poster, #bordered {
     -fx-border-color: -fx-secondary;
     -fx-border-width: 2px;
     -fx-border-radius: 3px;

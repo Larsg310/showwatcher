@@ -33,7 +33,7 @@ public class MainController
         ShowManager.getTVShows().forEach(s -> {
             PosterShow poster = new PosterShow(s);
             Tooltip tooltip = new Tooltip();
-            tooltip.setText(DescriptionManager.getShowDescription(s, tooltip::setText));
+            DescriptionManager.getShowDescription(s, tooltip::setText);
             tooltip.setFont(new Font(16D));
             tooltip.setWrapText(true);
             tooltip.setPrefWidth(600);

@@ -2,31 +2,37 @@ package nl.larsgerrits.showwatcher.show;
 
 import com.google.common.base.Objects;
 
+import java.nio.file.Path;
 import java.util.Date;
 
 public class TVEpisode
 {
     private String title;
     private int episodeNumber;
-    private String fileName;
+    private Path videoFile;
     private Date releaseDate;
     private boolean watched;
     private TVSeason season;
     
-    public TVEpisode(String title, int episodeNumber, String fileName, Date releaseDate, TVSeason season, boolean watched)
+    public TVEpisode(String title, int episodeNumber, Path videoFile, Date releaseDate, TVSeason season, boolean watched)
     {
         this.title = title;
         this.episodeNumber = episodeNumber;
-        this.fileName = fileName;
+        this.videoFile = videoFile;
         this.releaseDate = releaseDate;
         this.season = season;
         this.watched = watched;
     }
     
-    public void setFileName(String fileName)
+    public void setVideoFile(Path videoFile)
     {
-        this.fileName = fileName;
+        this.videoFile = videoFile;
         season.setDirty(true);
+    }
+    
+    public void setReleaseDate(Date releaseDate)
+    {
+        this.releaseDate = releaseDate;
     }
     
     public int getEpisodeNumber()
@@ -34,9 +40,9 @@ public class TVEpisode
         return episodeNumber;
     }
     
-    public String getFileName()
+    public Path getVideoFile()
     {
-        return fileName;
+        return videoFile;
     }
     
     public Date getReleaseDate()

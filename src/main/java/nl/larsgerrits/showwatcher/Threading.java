@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 public class Threading
 {
     public static ExecutorService IMAGE_THREAD = Executors.newSingleThreadExecutor();
-    public static ExecutorService DOWNLOAD_THREAD = Executors.newFixedThreadPool(4);
+    public static ExecutorService DOWNLOAD_THREAD = Executors.newSingleThreadExecutor();
     public static ExecutorService LOADING_THREAD = Executors.newSingleThreadExecutor();
     public static ExecutorService FILE_THREAD = Executors.newSingleThreadExecutor();
     public static ExecutorService API_THREAD = Executors.newSingleThreadExecutor();
