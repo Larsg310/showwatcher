@@ -39,14 +39,10 @@ public class FileUtils
     {
         try (DirectoryStream<Path> showPaths = Files.newDirectoryStream(Settings.BASE_PATH))
         {
-            //            List<Path> paths = new ArrayList<>();
-            //            showPaths.forEach(paths::add);
-            //            paths.sort(Comparator.comparing(Path::toString));
-            for (Path path : showPaths/*paths*/)
+            for (Path path : showPaths)
             {
                 if (Files.exists(path.resolve(Reference.SEASON_INFO_FILE)))
                 {
-                    // System.out.println(path);
                     SeasonData data = parseSeasonData(path);
                     if (data != null)
                     {
@@ -167,85 +163,6 @@ public class FileUtils
         return path;
     }
     
-    /**
-     * // @SuppressWarnings("ResultOfMethodCallIgnored")
-     * // private static void fixSeasonMetadata(SeasonData info, File dir)
-     * // {
-     * //     try
-     * //     {
-     * //         Map<Integer, File> toRename = new HashMap<>();
-     * //
-     * //         Response<List<Episode>> response = TRAKT_TV.seasons().season(info.getImdbId(), info.getSeason(), Extended.FULLEPISODES).execute();
-     * //
-     * //         if (response.isSuccessful())
-     * //         {
-     * //             Map<Integer, String> map = new HashMap<>();
-     * //
-     * //             File[] episodeFiles = dir.listFiles(f -> f.getTitle().startsWith("episode_"));
-     * //             assert episodeFiles != null;
-     * //             for (File f : episodeFiles)
-     * //             {
-     * //                 String[] details = f.getTitle().replace(".mkv", "").split("_");
-     * //                 int number = Integer.parseInt(details[1]);
-     * //                 // System.out.println(Arrays.toString(details));
-     * //                 if (details.length == 2)
-     * //                 {
-     * //                     // System.out.println(f.getPath().replace(".mkv", ""));
-     * //                     toRename.put(number, f);
-     * //                 }
-     * //                 map.put(number, f.getTitle());
-     * //             }
-     * //
-     * //             List<EpisodeData> episodeData = new ArrayList<>();
-     * //             assert response.body() != null;
-     * //             for (com.uwetrottmann.trakt5.entities.Episode episode : response.body())
-     * //             {
-     * //                 if (episode.title != null && !episode.title.isEmpty())
-     * //                 {
-     * //                     EpisodeData ep = new EpisodeData();
-     * //                     ep.setEpisode(episode.number);
-     * //                     ep.setTitle(episode.title);
-     * //                     if (episode.first_aired != null)
-     * //                     {
-     * //                         ep.setReleaseDate(episode.first_aired.withOffsetSameInstant(ZoneOffset.of(OffsetDateTime.now().getOffset().toString())));
-     * //                     }
-     * //                     if (map.containsKey(episode.number)) ep.setVideoFile(map.get(episode.number));
-     * //                     if (toRename.keySet().contains(episode.number))
-     * //                     {
-     * //                         String fileName = "episode_" + String.format("%02d", episode.number) + "_" + getSimplifiedName(episode.title) + ".mkv";
-     * //                         ep.setVideoFile(fileName);
-     * //                         File f = toRename.get(episode.number);
-     * //                         String newPath = f.getParent() + "\\" + fileName;
-     * //                         f.renameTo(new File(newPath));
-     * //                     }
-     * //                     episodeData.add(ep);
-     * //                 }
-     * //             }
-     * //             info.setEpisodeData(episodeData);
-     * //         }
-     * //
-     * //         Response<Show> showResponse = TRAKT_TV.shows().summary(info.getImdbId(), null).execute();
-     * //         if (showResponse.isSuccessful())
-     * //         {
-     * //             assert showResponse.body() != null;
-     * //             info.setTitle(showResponse.body().title);
-     * //         }
-     * //
-     * //         String json = GSON.toJson(info);
-     * //
-     * //         try (FileWriter writer = new FileWriter(Paths.get(dir.getPath() + File.separator + "season_info.json").toFile()))
-     * //         {
-     * //             writer.write(json);
-     * //         }
-     * //     }
-     * //     catch (IOException e)
-     * //     {
-     * //         e.printStackTrace();
-     * //     }
-     * // }
-     * //
-     */
-    //    /***/
     public static String getSimplifiedName(String filename)
     {
         return stripDiacritics(filename.toLowerCase()).replace(' ', '_')//
@@ -283,8 +200,6 @@ public class FileUtils
     
     public static void write(Path path, String content)
     {
-        // if (Files.notExists(path))
-        // {
         try
         {
             if (Files.notExists(path)) Files.createFile(path);
@@ -294,7 +209,6 @@ public class FileUtils
             }
         }
         catch (IOException e) {e.printStackTrace(); }
-        // }
     }
     
     public static Path getSaveDir(TVEpisode episode)

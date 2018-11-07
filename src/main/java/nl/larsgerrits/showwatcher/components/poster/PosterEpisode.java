@@ -1,5 +1,6 @@
 package nl.larsgerrits.showwatcher.components.poster;
 
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -18,14 +19,13 @@ public class PosterEpisode extends AnchorPane
     private ImageView imageView = new ImageView();
     
     private Text text = new Text();
-    private double imageHeight = 0;
     
-    private Consumer<TVEpisode> episodeChangeListener;
+    private Consumer<TVEpisode> episodeSelectedListener;
     
-    public PosterEpisode(TVEpisode episode, Consumer<TVEpisode> episodeChangeListener)
+    public PosterEpisode(TVEpisode episode, Consumer<TVEpisode> episodeSelectedListener)
     {
         this.episode = episode;
-        this.episodeChangeListener = episodeChangeListener;
+        this.episodeSelectedListener = episodeSelectedListener;
         
         setPrefHeight(155);
         setPrefWidth(210);
@@ -45,12 +45,12 @@ public class PosterEpisode extends AnchorPane
         setOnMouseClicked(e -> onClicked());
         ImageManager.getPosterURLForTVEpisode(episode, this::setImage);
         
-        // if (episode.isWatched())
-        // {
-        //     ColorAdjust effect = new ColorAdjust();
-        //     effect.setSaturation(-1D);
-        //     imageView.setEffect(effect);
-        // }
+        if (episode.isWatched())
+        {
+            ColorAdjust effect = new ColorAdjust();
+            effect.setSaturation(-1D);
+            imageView.setEffect(effect);
+        }
         
         setLeftAnchor(imageView, 10D);
         setRightAnchor(imageView, 10D);
@@ -61,30 +61,13 @@ public class PosterEpisode extends AnchorPane
     
     private void onClicked()
     {
-        if (episodeChangeListener != null) episodeChangeListener.accept(episode);
+        if (episodeSelectedListener != null) episodeSelectedListener.accept(episode);
     }
-    
-    // public void initialize()
-    // {
-    // setOnMouseClicked(e -> {
-    //     try
-    //     {
-    //         if (StringUtils.isNotEmpty(episode.getVideoFile()) && episode.getSeason().getPath() != null)
-    //         {
-    //             Desktop.getDesktop().open(episode.getSeason().getPath().resolve(episode.getVideoFile()).toFile());
-    //         }
-    //     }
-    //     catch (IOException e1)
-    //     {
-    //         e1.printStackTrace();
-    //     }
-    // });
-    // }
     
     private void setImage(Image image)
     {
         imageView.setImage(image);
-        imageHeight = 188 * (image.getHeight() / image.getWidth());
+        double imageHeight = 188 * (image.getHeight() / image.getWidth());
         text.setLayoutY(26 + imageHeight);
         
         setPrefHeight(18 + imageHeight + text.getLayoutBounds().getHeight());

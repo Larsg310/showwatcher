@@ -37,11 +37,6 @@ public final class Settings
         
         CACHE_PATH = BASE_PATH.resolve(Reference.CACHE_MAP);
         COLLECTIONS_PATH = BASE_PATH.resolve(Reference.COLLECTIONS_MAP);
-        
-        System.out.println(BASE_PATH);
-        //        System.out.println(System.getProperty("user.home"));
-        //        System.getProperties().list(System.out);
-        //        System.out.println();
     }
     
     private static Map<String, String> readSettings(Path path)

@@ -39,7 +39,6 @@ public final class DownloadManager
     
     public static void downloadEpisode(TVEpisode episode)
     {
-        // downloadQueue.add(episode);
         Threading.DOWNLOAD_THREAD.execute(() -> {
             Torrent torrent = TorrentCollector.getTorrent(episode);
             
@@ -117,7 +116,6 @@ public final class DownloadManager
             byte[] data = manager.fetchMagnet(magnetUrl, 60);
             TorrentInfo ti = TorrentInfo.bdecode(data);
             
-            // System.out.println(Entry.bdecode(data).toString());
             
             manager.download(ti, saveDir.toFile());
             

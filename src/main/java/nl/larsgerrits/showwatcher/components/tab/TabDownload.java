@@ -21,9 +21,7 @@ public class TabDownload extends Tab
 {
     private final FontAwesomeIconView DOWNLOAD = new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD, "20px");
     
-    private ScrollPane scrollPane = new ScrollPane();
     private VBox downloads = new VBox();
-    private JFXButton downloadAll = new JFXButton();
     
     private List<TVEpisode> toDownload = new ArrayList<>();
     
@@ -36,7 +34,8 @@ public class TabDownload extends Tab
         AnchorPane pane = new AnchorPane();
         pane.setId("bordered");
         pane.getStyleClass().addAll("anchor-pane");
-        
+    
+        ScrollPane scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         //        scrollPane.setPrefHeight(1000);
@@ -44,20 +43,13 @@ public class TabDownload extends Tab
         scrollPane.setLayoutX(10);
         scrollPane.setLayoutY(40);
         scrollPane.setFitToWidth(true);
-        
+    
+        JFXButton downloadAll = new JFXButton();
         downloadAll.setId("button");
         downloadAll.setText("Download All");
         downloadAll.setOnMouseClicked(e -> downloadAll());
         AnchorPane.setTopAnchor(downloadAll, 16D);
         AnchorPane.setRightAnchor(downloadAll, 16D);
-        
-        // downloads.setPrefWidth(800);
-        // downloads.setPrefHeight(1000);
-        // AnchorPane.setTopAnchor(downloads, 10D);
-        // AnchorPane.setLeftAnchor(downloads, 10D);
-        
-        // downloads.getChildren().add(new Download(ShowManager.getTVShows().get(0).getSeasons().get(2).getEpisodes().get(7), .70));
-        // downloads.getChildren().add(new Download(ShowManager.getTVShows().get(0).getSeasons().get(5).getEpisodes().get(19), .70));
         
         downloads.setSpacing(10);
         

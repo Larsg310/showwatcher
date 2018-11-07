@@ -94,41 +94,9 @@ public final class HTTPUtils
                 fis.close();
                 
                 Files.delete(gzipPath);
-                
-                // FileUtils.write(path, Files.lines(path).filter(filter).collect(Collectors.joining("\n")));
             }
             
             return Files.lines(path);
-            // URI zipUri = URI.create(url);
-            //
-            // Map<String, Object> env = new HashMap<>();
-            // env.put("create", "true");
-            // FileSystem zipFS = FileSystems.newFileSystem(zipUri, env, null);
-            //
-            // Path txtPath = zipFS.getPath("ettv_full.txt");
-            // Files.lines(txtPath, UTF_8).forEach(System.out::println);
-            
-            // HttpURLConnection con = getConnection(url);
-            // StringBuilder response = new StringBuilder();
-            //
-            // GZIPInputStream gzip = new GZIPInputStream(con.getInputStream());
-            // BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
-            // String line;
-            // while ((line = br.readLine()) != null)
-            // {
-            //     System.out.println(line);
-            //     response.append(line).append("\n");
-            // }
-            // //
-            // // System.out.println(con.getJarFile().getName());
-            //
-            // // BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            // // String inputLine;
-            // //
-            // // while ((inputLine = in.readLine()) != null) response.append(inputLine);
-            // // in.close();
-            //
-            // return response.toString();
         }
         catch (IOException e)
         {

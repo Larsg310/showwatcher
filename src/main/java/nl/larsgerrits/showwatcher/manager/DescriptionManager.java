@@ -78,32 +78,5 @@ public final class DescriptionManager
                 }
             });
         }
-        
-        // Threading.IMAGE_THREAD.execute(() -> {
-        //     try
-        //     {
-        //         Response<Episode> response = FileUtils.TRAKT_TV.episodes().summary(episode.getSeason().getShow().getImdbId(), episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber(), Extended.FULL).execute();
-        //         if (response.isSuccessful() && response.body() != null)
-        //         {
-        //             if (response.body().overview != null)
-        //             {
-        //                 episodeDescriptionTable.put(episode.getSeason().getShow().getImdbId() + "_" + episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber(), response.body().overview);
-        //             }
-        //         }
-        //     }
-        //     catch (IOException e)
-        //     {
-        //         e.printStackTrace();
-        //     }
-        //     finally
-        //     {
-        //         if (episodeDescriptionTable.contains(episode.getSeason().getShow().getImdbId() + "_" + episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber()))
-        //         {
-        //             callback.accept(episodeDescriptionTable.get(episode.getSeason().getShow().getImdbId() + "_" + episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber()));
-        //         }
-        //     }
-        //
-        // });
-        
     }
 }

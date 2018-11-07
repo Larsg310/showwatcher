@@ -64,7 +64,6 @@ public final class ShowManager
                 TVEpisode episode = new TVEpisode(episodeData.getTitle(), episodeData.getEpisode(), Strings.isNullOrEmpty(episodeData.getFileName()) ? null : path.resolve(episodeData.getFileName()), date, season, episodeData.isWatched());
                 season.addEpisode(episode, false);
             }
-            //            System.out.println(season.getShow().getTitle() + ": " + season.getSeasonNumber());
         }
         show.addSeason(season, false);
         return season;

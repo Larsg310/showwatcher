@@ -27,7 +27,6 @@ public class MainController
     
     public void initialize()
     {
-        // tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
         tabPane.getSelectionModel().select(2);
         
         ShowManager.getTVShows().forEach(s -> {
@@ -67,18 +66,4 @@ public class MainController
         });
         node.setOnMouseExited(event -> tooltip.hide());
     }
-    
-    // private void onResizeWidth(ObservableValue<? extends Number> obs, Number oldVal, Number newVal)
-    // {
-    //     flow.setPrefWrapLength(newVal.intValue());
-    // }
-    
-    // @Override
-    // public void setStage(Stage stage)
-    // {
-    //     super.setStage(stage);
-    //     // stage.widthProperty().addListener(this::onResizeWidth);
-    //
-    //     masonryPane.getChildren().stream().map(n -> (PosterShow)n).forEach(n -> n.setStage(stage));
-    // }
 }

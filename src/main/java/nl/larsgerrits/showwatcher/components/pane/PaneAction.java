@@ -86,7 +86,7 @@ public class PaneAction extends AnchorPane
                     episode.setWatched(true);
                     try
                     {
-                        Desktop.getDesktop().open(episode.getVideoFile().toFile()); //TODO: Add builtin video player
+                        Desktop.getDesktop().open(episode.getVideoFile().toFile()); //TODO: (maybe) add builtin video player
                     }
                     catch (IOException e1)
                     {

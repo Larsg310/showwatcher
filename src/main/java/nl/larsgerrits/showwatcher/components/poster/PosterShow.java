@@ -2,7 +2,6 @@ package nl.larsgerrits.showwatcher.components.poster;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
@@ -39,12 +38,5 @@ public class PosterShow extends AnchorPane
     {
         text.setText(show.getTitle());
         ImageManager.getPosterURLForTVShow(show, imageView::setImage);
-        // TabShow controller = new TabShow(show);
-    }
-    
-    public void onDownloadImage(String url)
-    {
-        Image image = new Image(url);
-        imageView.setImage(image);
     }
 }

@@ -18,7 +18,6 @@ public class TraktSeasonDeserializer implements JsonDeserializer<List<TraktSeaso
         List<TraktSeason> seasons = new ArrayList<>();
         
         JsonArray seasonArray = json.getAsJsonArray();
-        // System.out.println(seasonArray);
         
         for (JsonElement e : seasonArray)
         {
