@@ -28,6 +28,7 @@ public class PaneDescription extends AnchorPane
         
         // imageView.set
         imageView.setFitHeight(height - 32);
+        imageView.setFitWidth(150);
         imageView.setPreserveRatio(true);
         AnchorPane.setLeftAnchor(imageView, 16D);
         AnchorPane.setTopAnchor(imageView, 16D);
