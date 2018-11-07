@@ -4,6 +4,9 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import nl.larsgerrits.showwatcher.gson.TMDBFindDeserializer;
+import nl.larsgerrits.showwatcher.show.TVEpisode;
+import nl.larsgerrits.showwatcher.show.TVSeason;
+import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;
 
@@ -23,6 +26,18 @@ public class IDMapper
     public static void close()
     {
         FileUtils.saveIdMap(imdbToTmdb);
+    }
+    
+    public static int getTmdbId(TVEpisode episode){
+        return getTmdbId(episode.getSeason());
+    }
+
+    public static int getTmdbId(TVSeason season){
+        return getTmdbId(season.getShow());
+    }
+
+    public static int getTmdbId(TVShow show){
+        return getTmdbId(show.getImdbId());
     }
     
     public static int getTmdbId(String imdbId)
