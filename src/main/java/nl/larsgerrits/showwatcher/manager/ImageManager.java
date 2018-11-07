@@ -64,7 +64,7 @@ public final class ImageManager
     
     public static void getPosterURLForTVEpisode(TVEpisode episode, @Nonnull Consumer<Image> callback)
     {
-        Path path = Settings.CACHE_PATH.resolve(String.format("%s_%d_%d", episode.getSeason().getShow().getImdbId(), episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber()));
+        Path path = Settings.CACHE_PATH.resolve(String.format("%s_%d_%d.png", episode.getSeason().getShow().getImdbId(), episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber()));
         
         if (Files.exists(path))
         {
