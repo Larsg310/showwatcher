@@ -3,7 +3,7 @@ package nl.larsgerrits.showwatcher.api_impl.tmdb;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import nl.larsgerrits.showwatcher.gson.TMDBFindDeserializer;
+import nl.larsgerrits.showwatcher.gson.tmdb.TMDBFindDeserializer;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 import nl.larsgerrits.showwatcher.show.TVShow;

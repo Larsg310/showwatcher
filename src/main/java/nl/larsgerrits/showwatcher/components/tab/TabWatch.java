@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.components;
+package nl.larsgerrits.showwatcher.components.tab;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;

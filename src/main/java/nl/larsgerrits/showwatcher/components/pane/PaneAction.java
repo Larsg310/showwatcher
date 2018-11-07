@@ -1,10 +1,11 @@
-package nl.larsgerrits.showwatcher.components;
+package nl.larsgerrits.showwatcher.components.pane;
 
 import com.jfoenix.controls.JFXButton;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
+import nl.larsgerrits.showwatcher.components.tab.TabShow;
 import nl.larsgerrits.showwatcher.manager.DownloadManager;
 import nl.larsgerrits.showwatcher.manager.ShowManager;
 import nl.larsgerrits.showwatcher.show.TVEpisode;

@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.components;
+package nl.larsgerrits.showwatcher.components.tab;
 
 import com.jfoenix.controls.JFXTabPane;
 import javafx.application.Platform;
@@ -8,6 +8,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import nl.larsgerrits.showwatcher.Main;
 import nl.larsgerrits.showwatcher.Threading;
+import nl.larsgerrits.showwatcher.components.pane.PaneAction;
+import nl.larsgerrits.showwatcher.components.pane.PaneDescription;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 import nl.larsgerrits.showwatcher.show.TVShow;

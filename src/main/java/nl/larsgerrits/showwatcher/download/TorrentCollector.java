@@ -1,10 +1,9 @@
-package nl.larsgerrits.showwatcher.api_impl;
+package nl.larsgerrits.showwatcher.download;
 
 import nl.larsgerrits.showwatcher.api_impl.ettv.ETTVApi;
 import nl.larsgerrits.showwatcher.api_impl.eztv.EZTVApi;
 import nl.larsgerrits.showwatcher.api_impl.piratebay.PirateBayApi;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
-import nl.larsgerrits.showwatcher.show.Torrent;
 
 import java.util.ArrayList;
 import java.util.Comparator;

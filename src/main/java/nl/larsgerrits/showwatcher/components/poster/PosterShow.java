@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.components;
+package nl.larsgerrits.showwatcher.components.poster;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

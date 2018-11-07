@@ -1,7 +1,7 @@
 package nl.larsgerrits.showwatcher.api_impl.piratebay;
 
 import nl.larsgerrits.showwatcher.show.TVEpisode;
-import nl.larsgerrits.showwatcher.show.Torrent;
+import nl.larsgerrits.showwatcher.download.Torrent;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.show;
+package nl.larsgerrits.showwatcher.download;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

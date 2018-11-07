@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.gson;
+package nl.larsgerrits.showwatcher.gson.trakt;
 
 import com.google.gson.*;
 import nl.larsgerrits.showwatcher.api_impl.trakt.TraktEpisode;

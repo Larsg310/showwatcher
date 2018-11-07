@@ -1,10 +1,10 @@
-package nl.larsgerrits.showwatcher.components;
+package nl.larsgerrits.showwatcher.components.tab;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.control.Tab;
 import nl.larsgerrits.showwatcher.manager.ShowCollectionManager;
-import nl.larsgerrits.showwatcher.show.ShowCollection;
+import nl.larsgerrits.showwatcher.show.TVShowCollection;
 
 import java.util.List;
 
@@ -16,8 +16,8 @@ public class TabCollections extends Tab
     {
         setGraphic(FOLDER);
         
-        List<ShowCollection> collections = ShowCollectionManager.getShowCollection();
-//         ShowCollection collection = collections.get(0);
+        List<TVShowCollection> collections = ShowCollectionManager.getShowCollection();
+//         TVShowCollection collection = collections.get(0);
 //
 //         long currentTime = System.currentTimeMillis();
 //         List<TVEpisode> episodes = collection.getShows()//

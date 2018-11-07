@@ -1,7 +1,7 @@
-package nl.larsgerrits.showwatcher.gson;
+package nl.larsgerrits.showwatcher.gson.eztv;
 
 import com.google.gson.*;
-import nl.larsgerrits.showwatcher.show.Torrent;
+import nl.larsgerrits.showwatcher.download.Torrent;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

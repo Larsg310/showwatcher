@@ -3,7 +3,7 @@ package nl.larsgerrits.showwatcher.api_impl.ettv;
 import nl.larsgerrits.showwatcher.manager.ShowManager;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVShow;
-import nl.larsgerrits.showwatcher.show.Torrent;
+import nl.larsgerrits.showwatcher.download.Torrent;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;
 

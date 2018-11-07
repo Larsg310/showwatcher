@@ -6,10 +6,10 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.alerts.*;
 import javafx.application.Platform;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api_impl.TorrentCollector;
+import nl.larsgerrits.showwatcher.download.TorrentCollector;
 import nl.larsgerrits.showwatcher.download.Download;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
-import nl.larsgerrits.showwatcher.show.Torrent;
+import nl.larsgerrits.showwatcher.download.Torrent;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 
 import java.nio.file.Files;

@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.gson;
+package nl.larsgerrits.showwatcher.gson.show;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

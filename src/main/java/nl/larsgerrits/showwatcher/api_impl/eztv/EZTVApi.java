@@ -2,10 +2,10 @@ package nl.larsgerrits.showwatcher.api_impl.eztv;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import nl.larsgerrits.showwatcher.gson.EZTVDeserializer;
+import nl.larsgerrits.showwatcher.gson.eztv.EZTVDeserializer;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVShow;
-import nl.larsgerrits.showwatcher.show.Torrent;
+import nl.larsgerrits.showwatcher.download.Torrent;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;
 
 import java.util.Comparator;

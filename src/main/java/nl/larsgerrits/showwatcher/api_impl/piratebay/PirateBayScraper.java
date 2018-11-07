@@ -1,6 +1,6 @@
 package nl.larsgerrits.showwatcher.api_impl.piratebay;
 
-import nl.larsgerrits.showwatcher.show.Torrent;
+import nl.larsgerrits.showwatcher.download.Torrent;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

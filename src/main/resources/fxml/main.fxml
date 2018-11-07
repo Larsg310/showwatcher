@@ -5,8 +5,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
-<?import nl.larsgerrits.showwatcher.components.TabDownload?>
-<?import nl.larsgerrits.showwatcher.components.TabCollections?>
+<?import nl.larsgerrits.showwatcher.components.tab.TabDownload?>
+<?import nl.larsgerrits.showwatcher.components.tab.TabCollections?>
 <JFXTabPane xmlns:fx="http://javafx.com/fxml"
             prefHeight="1000.0"
             prefWidth="1784.0"

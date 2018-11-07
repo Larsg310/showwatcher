@@ -6,8 +6,8 @@ import nl.larsgerrits.showwatcher.Reference;
 import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.data.EpisodeData;
 import nl.larsgerrits.showwatcher.data.SeasonData;
-import nl.larsgerrits.showwatcher.gson.ShowCollectionDeserializer;
-import nl.larsgerrits.showwatcher.show.ShowCollection;
+import nl.larsgerrits.showwatcher.gson.show.ShowCollectionDeserializer;
+import nl.larsgerrits.showwatcher.show.TVShowCollection;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 
@@ -104,9 +104,9 @@ public class FileUtils
         return result;
     }
     
-    public static List<ShowCollection> loadShowCollectionsFromDisk()
+    public static List<TVShowCollection> loadShowCollectionsFromDisk()
     {
-        List<ShowCollection> showCollections = new ArrayList<>();
+        List<TVShowCollection> showCollections = new ArrayList<>();
         
         if (!Files.exists(Settings.COLLECTIONS_PATH)) return showCollections;
         
@@ -115,7 +115,7 @@ public class FileUtils
             for (Path path : showPaths)
             {
                 String json = Files.lines(path, Charset.forName("UTF-8")).collect(Collectors.joining());
-                ShowCollection collection = COLLECTION_GSON.fromJson(json, ShowCollection.class);
+                TVShowCollection collection = COLLECTION_GSON.fromJson(json, TVShowCollection.class);
                 showCollections.add(collection);
             }
         }

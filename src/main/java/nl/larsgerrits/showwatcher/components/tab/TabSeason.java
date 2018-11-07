@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.components;
+package nl.larsgerrits.showwatcher.components.tab;
 
 import com.jfoenix.controls.JFXMasonryPane;
 import javafx.application.Platform;
@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import nl.larsgerrits.showwatcher.Threading;
+import nl.larsgerrits.showwatcher.components.poster.PosterEpisode;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 

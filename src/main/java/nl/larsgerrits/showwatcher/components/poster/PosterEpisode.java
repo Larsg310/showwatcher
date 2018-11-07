@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.components;
+package nl.larsgerrits.showwatcher.components.poster;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

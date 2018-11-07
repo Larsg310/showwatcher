@@ -2,9 +2,9 @@ package nl.larsgerrits.showwatcher.api_impl.tmdb;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import nl.larsgerrits.showwatcher.gson.TMDBEpisodePosterDeserializer;
-import nl.larsgerrits.showwatcher.gson.TMDBSeasonPosterDeserializer;
-import nl.larsgerrits.showwatcher.gson.TMDBShowPosterDeserializer;
+import nl.larsgerrits.showwatcher.gson.tmdb.TMDBEpisodePosterDeserializer;
+import nl.larsgerrits.showwatcher.gson.tmdb.TMDBSeasonPosterDeserializer;
+import nl.larsgerrits.showwatcher.gson.tmdb.TMDBShowPosterDeserializer;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 import nl.larsgerrits.showwatcher.show.TVShow;
