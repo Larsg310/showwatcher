@@ -14,6 +14,8 @@ import java.util.function.Consumer;
 
 public class PosterEpisode extends AnchorPane
 {
+    private static final ColorAdjust GRAYSCALE_EFFECT = new ColorAdjust(0, -1, 0, 0);
+    
     private TVEpisode episode;
     
     private ImageView imageView = new ImageView();
@@ -26,6 +28,7 @@ public class PosterEpisode extends AnchorPane
     {
         this.episode = episode;
         this.episodeSelectedListener = episodeSelectedListener;
+        episode.setWatchedChangedListener(this::updateWatched);
         
         setPrefHeight(155);
         setPrefWidth(210);
@@ -45,12 +48,7 @@ public class PosterEpisode extends AnchorPane
         setOnMouseClicked(e -> onClicked());
         ImageManager.getPosterURLForTVEpisode(episode, this::setImage);
         
-        if (episode.isWatched())
-        {
-            ColorAdjust effect = new ColorAdjust();
-            effect.setSaturation(-1D);
-            imageView.setEffect(effect);
-        }
+        updateWatched(episode.isWatched());
         
         setLeftAnchor(imageView, 10D);
         setRightAnchor(imageView, 10D);
@@ -77,5 +75,10 @@ public class PosterEpisode extends AnchorPane
     public TVEpisode getEpisode()
     {
         return episode;
+    }
+    
+    public void updateWatched(boolean watched)
+    {
+        imageView.setEffect(watched ? GRAYSCALE_EFFECT : null);
     }
 }

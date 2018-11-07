@@ -27,7 +27,7 @@ public class PaneAction extends AnchorPane
         setPrefWidth(width);
         setPrefHeight(height);
         
-        getStyleClass().addAll("anchor-pane-2");
+        getStyleClass().addAll("anchor-pane");
         
         JFXButton closeButton = new JFXButton();
         closeButton.setGraphic(CROSS_ICON);

@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.function.Consumer;
 
 public class TVEpisode
 {
@@ -13,6 +14,8 @@ public class TVEpisode
     private Date releaseDate;
     private boolean watched;
     private TVSeason season;
+    
+    private Consumer<Boolean> watchedChangeListener = null;
     
     public TVEpisode(String title, int episodeNumber, Path videoFile, Date releaseDate, TVSeason season, boolean watched)
     {
@@ -67,8 +70,12 @@ public class TVEpisode
     
     public void setWatched(boolean watched)
     {
+        if (this.watched != watched)
+        {
+            season.setDirty(true);
+            if (watchedChangeListener != null) watchedChangeListener.accept(watched);
+        }
         this.watched = watched;
-        season.setDirty(true);
     }
     
     @Override
@@ -84,5 +91,10 @@ public class TVEpisode
         if (o == null || getClass() != o.getClass()) return false;
         TVEpisode episode = (TVEpisode) o;
         return episodeNumber == episode.episodeNumber && Objects.equal(season, episode.season);
+    }
+    
+    public void setWatchedChangedListener(Consumer<Boolean> watchedChangeListener)
+    {
+        this.watchedChangeListener = watchedChangeListener;
     }
 }
