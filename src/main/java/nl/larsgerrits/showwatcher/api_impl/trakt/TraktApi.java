@@ -17,6 +17,7 @@ public final class TraktApi
     private static final Map<String, String> traktHeaders = new HashMap<>();
     private static final Gson seasonGson = new GsonBuilder().registerTypeAdapter(List.class, new TraktSeasonDeserializer()).create();
     private static final Gson episodeGson = new GsonBuilder().registerTypeAdapter(TraktEpisode.class, new TraktEpisodeDeserializer()).create();
+    
     private static final Map<TVShow, List<TraktSeason>> showSeasonCache = new HashMap<>();
     private static final Map<TVSeason, List<TraktEpisode>> seasonEpisodeCache = new HashMap<>();
     
@@ -45,6 +46,12 @@ public final class TraktApi
     {
         String jsonResponse = HTTPUtils.get("https://api.trakt.tv/shows/" + show.getImdbId() + "/seasons?extended=full", traktHeaders);
         return seasonGson.fromJson(jsonResponse, List.class);
+    }
+    
+    @Nullable
+    public static TraktSeason getSeason(TVShow show, int season)
+    {
+        return getSeasons(show).stream().filter(s -> s.getSeasonNumber() == season).findFirst().orElse(null);
     }
     
     @Nullable

@@ -34,7 +34,7 @@ public class TabDownload extends Tab
         AnchorPane pane = new AnchorPane();
         pane.setId("bordered");
         pane.getStyleClass().addAll("anchor-pane");
-    
+        
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -43,7 +43,7 @@ public class TabDownload extends Tab
         scrollPane.setLayoutX(10);
         scrollPane.setLayoutY(40);
         scrollPane.setFitToWidth(true);
-    
+        
         JFXButton downloadAll = new JFXButton();
         downloadAll.setId("button");
         downloadAll.setText("Download All");
@@ -80,7 +80,11 @@ public class TabDownload extends Tab
                                         .collect(Collectors.toList());
         
         toDownload.addAll(episodes);
-        DownloadManager.downloadEpisode(toDownload.remove(0));
+        
+        if (!toDownload.isEmpty())
+        {
+            DownloadManager.downloadEpisode(toDownload.remove(0));
+        }
         // DownloadManager.downloadEpisodes(episodes);
     }
 }

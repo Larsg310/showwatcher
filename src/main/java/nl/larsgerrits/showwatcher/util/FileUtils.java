@@ -192,7 +192,7 @@ public class FileUtils
             Map<String, Double> jsonMap = GSON.fromJson(Files.lines(Settings.CACHE_PATH.resolve(Reference.ID_MAP_FILE), Charset.forName("UTF-8")).collect(Collectors.joining()), Map.class);
             for (Map.Entry<String, Double> entry : jsonMap.entrySet())
             {
-                imdbToTmdb.put(entry.getKey(), (int) entry.getValue().doubleValue());
+                imdbToTmdb.put(entry.getKey(), entry.getValue().intValue());
             }
         }
         catch (IOException e) {e.printStackTrace(); }

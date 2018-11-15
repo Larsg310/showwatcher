@@ -5,22 +5,23 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import nl.larsgerrits.showwatcher.api_impl.tmdb.IDMapper;
+import nl.larsgerrits.showwatcher.manager.DescriptionManager;
 import nl.larsgerrits.showwatcher.manager.ShowManager;
-
-import java.io.IOException;
 
 public class Main extends Application
 {
     public static int WIDTH = 1784;
     
     @Override
-    public void start(Stage stage) throws IOException
+    public void start(Stage stage) throws Exception
     {
         stage.setOnCloseRequest(e -> {
-            Threading.close();
             IDMapper.close();
             ShowManager.close();
+            Threading.close();
+            DescriptionManager.close();
         });
+    
         
         stage.widthProperty().addListener((obs, o, n) -> WIDTH = n.intValue());
         

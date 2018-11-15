@@ -113,7 +113,8 @@ public final class HTTPUtils
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
         
         if (headers != null) headers.forEach(con::setRequestProperty);
-        
+        // con.setConnectTimeout(0);
+        // con.setReadTimeout(0);
         con.connect();
         return con;
     }

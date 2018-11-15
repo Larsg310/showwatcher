@@ -1,33 +1,29 @@
 package nl.larsgerrits.showwatcher.manager;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
+import com.google.common.base.Strings;
 import javafx.application.Platform;
+import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.Threading;
 import nl.larsgerrits.showwatcher.api_impl.trakt.TraktApi;
 import nl.larsgerrits.showwatcher.api_impl.trakt.TraktEpisode;
+import nl.larsgerrits.showwatcher.cache.DescriptionCache;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVShow;
+import nl.larsgerrits.showwatcher.util.FileUtils;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public final class DescriptionManager
 {
     private static final String NO_DESCRIPTION = "No description found currently...";
     
-    private static Map<String, String> showDescription = new HashMap<>();
-    private static Table<String, Integer, String> seasonDescriptionTable = HashBasedTable.create();
-    private static Table<String, Integer, String> episodeDescriptionTable = HashBasedTable.create();
-    
     private DescriptionManager() {}
     
     public static void getShowDescription(TVShow show, Consumer<String> callback)
     {
-        if (showDescription.containsKey(show.getImdbId()))
+        if (DescriptionCache.hasShowDescription(show))
         {
-            callback.accept(showDescription.get(show.getImdbId()));
+            callback.accept(DescriptionCache.getShowDescription(show));
         }
         else
         {
@@ -60,23 +56,33 @@ public final class DescriptionManager
     
     public static void getEpisodeDescription(TVEpisode episode, Consumer<String> callback)
     {
-        String rowKey = episode.getSeason().getShow().getImdbId() + "_" + episode.getSeason().getSeasonNumber();
-        
-        if (episodeDescriptionTable.contains(rowKey, episode.getEpisodeNumber()))
+        String description;
+        if (DescriptionCache.hasEpisodeDescription(episode) && !Strings.isNullOrEmpty(description = DescriptionCache.getEpisodeDescription(episode)))
         {
-            callback.accept(episodeDescriptionTable.get(rowKey, episode.getEpisodeNumber()));
+            callback.accept(description);
         }
         else
         {
             callback.accept(NO_DESCRIPTION);
             Threading.IMAGE_THREAD.execute(() -> {
                 TraktEpisode e = TraktApi.getEpisode(episode.getSeason(), episode.getEpisodeNumber());
-                if (e != null)
+                if (e != null && !Strings.isNullOrEmpty(e.getOverview()))
                 {
                     Platform.runLater(() -> callback.accept(e.getOverview()));
-                    episodeDescriptionTable.put(rowKey, episode.getEpisodeNumber(), e.getOverview());
+                    DescriptionCache.addEpisodeDescription(episode, e.getOverview());
                 }
             });
         }
     }
+    
+    public static void close()
+    {
+        // List<TVEpisode> episodes = ShowManager.getTVShows().stream().flatMap(s -> s.getSeasons().stream()).flatMap(s -> s.getEpisodes().stream()).collect(Collectors.toList());
+        // Threading.DOWNLOAD_THREAD.execute(() -> episodes.forEach(e -> {
+        //     getEpisodeDescription(e, s -> {}, episodes.size());
+        //     FileUtils.write(Settings.CACHE_PATH.resolve("desc.json"), DescriptionCache.toJsonString());
+        // }));
+        FileUtils.write(Settings.CACHE_PATH.resolve("desc.json"), DescriptionCache.toJsonString());
+    }
+    
 }
