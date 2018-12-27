@@ -7,7 +7,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import nl.larsgerrits.showwatcher.download.Download;
+import nl.larsgerrits.showwatcher.components.download.Download;
 import nl.larsgerrits.showwatcher.manager.DownloadManager;
 import nl.larsgerrits.showwatcher.manager.ShowManager;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class TabDownload extends Tab
 {
-    private final FontAwesomeIconView DOWNLOAD = new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD, "20px");
+    public static final FontAwesomeIconView DOWNLOAD = new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD, "20px");
     
     private VBox downloads = new VBox();
     
@@ -29,6 +29,7 @@ public class TabDownload extends Tab
     {
         DownloadManager.setDownloadAddedCallback(downloads.getChildren()::add);
         DownloadManager.setDownloadFinishedCallback(this::downloadFinished);
+        DownloadManager.setCanceledCallback(this::next);
         setGraphic(DOWNLOAD);
         
         AnchorPane pane = new AnchorPane();
@@ -41,7 +42,7 @@ public class TabDownload extends Tab
         //        scrollPane.setPrefHeight(1000);
         scrollPane.setPrefWidth(300);
         scrollPane.setLayoutX(10);
-        scrollPane.setLayoutY(40);
+        scrollPane.setLayoutY(10);
         scrollPane.setFitToWidth(true);
         
         JFXButton downloadAll = new JFXButton();
@@ -61,6 +62,11 @@ public class TabDownload extends Tab
     private void downloadFinished(Download download)
     {
         if (download != null) downloads.getChildren().remove(download);
+        next();
+    }
+    
+    private void next()
+    {
         if (!toDownload.isEmpty())
         {
             TVEpisode e = toDownload.remove(0);
@@ -75,8 +81,7 @@ public class TabDownload extends Tab
                                         .flatMap(s -> s.getSeasons().stream())//
                                         .flatMap(s -> s.getEpisodes().stream())//
                                         .filter(e -> e.getVideoFile() == null)//
-                                        .filter(e -> e.getReleaseDate().getTime() > 0)//
-                                        .filter(e -> e.getReleaseDate().getTime() < System.currentTimeMillis())//
+                                        .filter(TVEpisode::isReleased)//
                                         .collect(Collectors.toList());
         
         toDownload.addAll(episodes);

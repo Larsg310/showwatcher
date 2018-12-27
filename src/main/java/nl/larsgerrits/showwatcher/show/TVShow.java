@@ -33,6 +33,12 @@ public class TVShow implements Iterable<TVSeason>
         return seasons.get(seasonNumber - 1);
     }
     
+    public boolean isCompletelyWatched()
+    {
+        if(seasons.isEmpty()) return false;
+        return seasons.stream().flatMap(s -> s.getEpisodes().stream()).allMatch(e -> e.getWatched().get() || !e.isReleased());
+    }
+    
     private Consumer<TVSeason> getSeasonAdded()
     {
         return seasonAdded == null ? t -> {} : seasonAdded;
@@ -48,19 +54,6 @@ public class TVShow implements Iterable<TVSeason>
     public Iterator<TVSeason> iterator()
     {
         return seasons.iterator();
-    }
-    
-    // public boolean isSeasonFullyDownloaded(int number)
-    // {
-    //     return seasons.stream()//
-    //                   .filter(season -> season.getSeasonNumber() == number)//
-    //                   .flatMap(season -> season.getEpisodes().stream())//
-    //                   .anyMatch(episode -> StringUtils.isEmpty(episode.getVideoFile()));
-    // }
-    
-    public void setWatched(boolean watched)
-    {
-        seasons.forEach(s -> s.setWatched(watched));
     }
     
     public boolean hasSeason(int number)

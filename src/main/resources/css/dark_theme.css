@@ -35,10 +35,6 @@
     -fx-background-color: -fx-secondary;
 }
 
-#show-tab {
-    /*-fx-pref-width: 223;*/
-}
-
 .tab {
     -fx-background-color: -fx-primary;
 }

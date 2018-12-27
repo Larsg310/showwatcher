@@ -16,11 +16,15 @@ import java.io.IOException;
 
 public class PaneAction extends AnchorPane
 {
-    public final FontAwesomeIconView CROSS_ICON = new FontAwesomeIconView(FontAwesomeIcon.TIMES, "40px");
-    public final FontAwesomeIconView PLAY = new FontAwesomeIconView(FontAwesomeIcon.PLAY, "20px");
-    public final FontAwesomeIconView DOWNLOAD = new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD, "20px");
+    public static final FontAwesomeIconView EYE_CLOSED = new FontAwesomeIconView(FontAwesomeIcon.EYE_SLASH, "40px");
+    public static final FontAwesomeIconView EYE_OPENED = new FontAwesomeIconView(FontAwesomeIcon.EYE, "40px");
+    public static final FontAwesomeIconView CROSS_ICON = new FontAwesomeIconView(FontAwesomeIcon.TIMES, "40px");
+    
+    public static final FontAwesomeIconView DOWNLOAD = new FontAwesomeIconView(FontAwesomeIcon.DOWNLOAD, "20px");
+    public static final FontAwesomeIconView PLAY = new FontAwesomeIconView(FontAwesomeIcon.PLAY, "20px");
     
     private JFXButton actionButton = new JFXButton();
+    private JFXButton watchedButton = new JFXButton();
     
     public PaneAction(TabShow tab, int width, int height)
     {
@@ -40,9 +44,22 @@ public class PaneAction extends AnchorPane
         actionButton.setId("button");
         actionButton.setFont(new Font(20));
         AnchorPane.setRightAnchor(actionButton, 10D);
+        
+        AnchorPane.setRightAnchor(watchedButton, 60D);
+        AnchorPane.setTopAnchor(watchedButton, 10D);
+        
         AnchorPane.setBottomAnchor(actionButton, 28D);
         
-        getChildren().addAll(closeButton, actionButton);
+        getChildren().addAll(watchedButton, closeButton, actionButton);
+    }
+    
+    public void setWatchedButtonIcon(TVEpisode episode)
+    {
+        watchedButton.setGraphic(episode.getWatched().get() ? EYE_CLOSED : EYE_OPENED);
+        watchedButton.setOnMouseClicked(e -> {
+            episode.getWatched().set(!episode.getWatched().get());
+            watchedButton.setGraphic(episode.getWatched().get() ? EYE_CLOSED : EYE_OPENED);
+        });
     }
     
     public void onSeasonSelected(TVSeason season)
@@ -73,20 +90,23 @@ public class PaneAction extends AnchorPane
     
     private void setActionButtonDownloadEpisode(TVEpisode episode)
     {
-        if(episode.getSeason().getPath() == null){
+        if (episode.getSeason().getPath() == null)
+        {
             setActionButtonDownloadSeason(episode.getSeason());
         }
-        else{
-            if(episode.getVideoFile() != null){
+        else
+        {
+            if (episode.getVideoFile() != null)
+            {
                 actionButton.setDisable(false);
                 actionButton.setVisible(true);
                 actionButton.setGraphic(PLAY);
                 actionButton.setText("Play Episode");
                 actionButton.setOnMouseClicked(e -> {
-                    episode.setWatched(true);
+                    episode.getWatched().set(true);
                     try
                     {
-                        Desktop.getDesktop().open(episode.getVideoFile().toFile()); //TODO: (maybe) add builtin video player
+                        Desktop.getDesktop().open(episode.getVideoFile().toFile());
                     }
                     catch (IOException e1)
                     {
@@ -94,8 +114,9 @@ public class PaneAction extends AnchorPane
                     }
                 });
             }
-            else{
-                actionButton.setDisable(episode.getReleaseDate().getTime() > System.currentTimeMillis());
+            else
+            {
+                actionButton.setDisable(!episode.isReleased());
                 actionButton.setVisible(true);
                 actionButton.setGraphic(DOWNLOAD);
                 actionButton.setText("Download Episode");
@@ -104,7 +125,7 @@ public class PaneAction extends AnchorPane
                     actionButton.setDisable(true);
                     actionButton.setGraphic(PLAY);
                     actionButton.setText("Play Episode");
-    
+                    
                 });
             }
         }

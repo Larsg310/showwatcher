@@ -1,10 +1,11 @@
 package nl.larsgerrits.showwatcher.manager;
 
 import com.google.common.base.Strings;
+import javafx.application.Platform;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api_impl.trakt.TraktApi;
-import nl.larsgerrits.showwatcher.api_impl.trakt.TraktEpisode;
-import nl.larsgerrits.showwatcher.api_impl.trakt.TraktSeason;
+import nl.larsgerrits.showwatcher.api_impl.info.trakt.TraktApi;
+import nl.larsgerrits.showwatcher.api_impl.info.trakt.TraktEpisode;
+import nl.larsgerrits.showwatcher.api_impl.info.trakt.TraktSeason;
 import nl.larsgerrits.showwatcher.data.EpisodeData;
 import nl.larsgerrits.showwatcher.data.SeasonData;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
@@ -16,6 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 
 public final class ShowManager
 {
@@ -72,6 +74,7 @@ public final class ShowManager
     public static void checkForNewUpdates(TVShow show)
     {
         Threading.API_THREAD.execute(() -> {
+            System.out.println("Updating " + show.getTitle());
             List<TraktSeason> tmdbSeasons = TraktApi.getSeasons(show);
             for (TraktSeason season : tmdbSeasons)
             {
@@ -89,6 +92,11 @@ public final class ShowManager
                         {
                             tvSeason.setReleaseDate(season.getReleaseDate());
                         }
+                        if (tvSeason.getTotalEpisodes() != season.getEpisodeCount())
+                        {
+                            tvSeason.setTotalEpisodes(season.getEpisodeCount());
+                        }
+                        // if(tvSeason.)
                     }
                 }
             }
@@ -103,11 +111,14 @@ public final class ShowManager
                         {
                             TVEpisode tvEpisode = new TVEpisode(episode.getTitle(), episode.getEpisodeNumber(), null, episode.getReleaseDate(), season, false);
                             season.addEpisode(tvEpisode, true);
-                            season.setDirty(true);
+                            // season.setDirty(true);
                         }
                         else
                         {
-                            season.getEpisode(episode.getEpisodeNumber()).setReleaseDate(episode.getReleaseDate());
+                            TVEpisode tvEpisode = season.getEpisode(episode.getEpisodeNumber());
+                            
+                            tvEpisode.setReleaseDate(episode.getReleaseDate());
+                            tvEpisode.setTitle(episode.getTitle());
                         }
                     }
                 }
@@ -123,16 +134,14 @@ public final class ShowManager
     
     public static void close()
     {
-        tvShows.stream()//
-               .flatMap(show -> show.getSeasons().stream())//
+        tvShows.stream().flatMap(show -> show.getSeasons().stream())//
                .filter(TVSeason::isDirty)//
-               .forEach(ShowManager::saveSeasonToDisk);
+               .filter(s -> s.getPath() != null).forEach(ShowManager::saveSeasonToDisk);
     }
     
     @Nullable
     public static TVShow getShow(String imdbId)
     {
-        
         return getTVShowMap().get(imdbId);
     }
     
@@ -146,5 +155,21 @@ public final class ShowManager
             if (show != null) shows.add(show);
         }
         return shows;
+    }
+    
+    public static void searchShows(String search, Consumer<TVShow> addShow)
+    {
+        if (Strings.isNullOrEmpty(search))
+        {
+            Threading.SEARCH_THREAD.execute(() -> {
+                for (int page = 0; page < 1; page++)
+                {
+                    List<TVShow> popular = TraktApi.getPopularShows(page);
+                    Set<String> existingIds = ShowManager.getTVShowMap().keySet();
+                    popular.stream().filter(s -> !existingIds.contains(s.getImdbId())).forEach(s -> Platform.runLater(() -> addShow.accept(s))
+                    );
+                }
+            });
+        }
     }
 }

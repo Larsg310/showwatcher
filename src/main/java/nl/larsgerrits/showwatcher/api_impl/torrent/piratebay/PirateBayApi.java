@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api_impl.piratebay;
+package nl.larsgerrits.showwatcher.api_impl.torrent.piratebay;
 
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.download.Torrent;
@@ -14,7 +14,7 @@ public final class PirateBayApi
     public static List<Torrent> request(TVEpisode e)
     {
         Query query = constructQuery(e);
-        System.out.println("URL: "+query.TranslateToUrl());
+        // System.out.println("URL: "+query.TranslateToUrl());
         return PirateBayScraper.search(query, e.getSeason().getSeasonNumber(), e.getEpisodeNumber());
     }
 

@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api_impl.eztv;
+package nl.larsgerrits.showwatcher.api_impl.torrent.eztv;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

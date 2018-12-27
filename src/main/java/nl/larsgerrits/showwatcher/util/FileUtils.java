@@ -7,7 +7,7 @@ import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.data.EpisodeData;
 import nl.larsgerrits.showwatcher.data.SeasonData;
 import nl.larsgerrits.showwatcher.gson.show.ShowCollectionDeserializer;
-import nl.larsgerrits.showwatcher.show.TVShowCollection;
+import nl.larsgerrits.showwatcher.show.TVEpisodeCollection;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class FileUtils
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Gson COLLECTION_GSON = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(List.class, new ShowCollectionDeserializer()).create();
+    private static final Gson COLLECTION_GSON = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(TVEpisodeCollection.class, new ShowCollectionDeserializer()).create();
     
     private static final Pattern DIACRITICS_AND_FRIENDS = Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
     
@@ -100,9 +100,9 @@ public class FileUtils
         return result;
     }
     
-    public static List<TVShowCollection> loadShowCollectionsFromDisk()
+    public static List<TVEpisodeCollection> loadShowCollectionsFromDisk()
     {
-        List<TVShowCollection> showCollections = new ArrayList<>();
+        List<TVEpisodeCollection> showCollections = new ArrayList<>();
         
         if (!Files.exists(Settings.COLLECTIONS_PATH)) return showCollections;
         
@@ -111,7 +111,7 @@ public class FileUtils
             for (Path path : showPaths)
             {
                 String json = Files.lines(path, Charset.forName("UTF-8")).collect(Collectors.joining());
-                TVShowCollection collection = COLLECTION_GSON.fromJson(json, TVShowCollection.class);
+                TVEpisodeCollection collection = COLLECTION_GSON.fromJson(json, TVEpisodeCollection.class);
                 showCollections.add(collection);
             }
         }
@@ -143,7 +143,7 @@ public class FileUtils
         List<EpisodeData> episodeData = new ArrayList<>();
         for (TVEpisode episode : season.getEpisodes())
         {
-            episodeData.add(new EpisodeData(episode.getEpisodeNumber(), episode.getTitle(), episode.getVideoFile() == null ? "" : episode.getVideoFile().getFileName().toString(), episode.getReleaseDate() == null ? 0L : episode.getReleaseDate().getTime(), episode.isWatched()));
+            episodeData.add(new EpisodeData(episode.getEpisodeNumber(), episode.getTitle(), episode.getVideoFile() == null ? "" : episode.getVideoFile().getFileName().toString(), episode.getReleaseDate() == null ? 0L : episode.getReleaseDate().getTime(), episode.getWatched().get()));
         }
         SeasonData data = new SeasonData(season.getShow().getTitle(), season.getShow().getImdbId(), season.getSeasonNumber(), season.getTotalEpisodes(), season.getReleaseDate() == null ? 0L : season.getReleaseDate().getTime(), episodeData);
         

@@ -1,10 +1,11 @@
 package nl.larsgerrits.showwatcher.show;
 
 import com.google.common.base.Objects;
+import nl.larsgerrits.showwatcher.property.Property;
 
+import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.function.Consumer;
 
 public class TVEpisode
 {
@@ -12,19 +13,19 @@ public class TVEpisode
     private int episodeNumber;
     private Path videoFile;
     private Date releaseDate;
-    private boolean watched;
+    private Property<Boolean> watched;
     private TVSeason season;
     
-    private Consumer<Boolean> watchedChangeListener = null;
-    
-    public TVEpisode(String title, int episodeNumber, Path videoFile, Date releaseDate, TVSeason season, boolean watched)
+    public TVEpisode(String title, int episodeNumber, Path videoFile, @Nonnull Date releaseDate, TVSeason season, boolean watched)
     {
         this.title = title;
         this.episodeNumber = episodeNumber;
         this.videoFile = videoFile;
         this.releaseDate = releaseDate;
         this.season = season;
-        this.watched = watched;
+        this.watched = new Property<>(watched);
+        
+        this.watched.addChangeListener((n,o) -> season.setDirty(true));
     }
     
     public void setVideoFile(Path videoFile)
@@ -36,6 +37,18 @@ public class TVEpisode
     public void setReleaseDate(Date releaseDate)
     {
         this.releaseDate = releaseDate;
+        season.setDirty(true);
+    }
+    
+    public void setTitle(String title)
+    {
+        this.title = title;
+        season.setDirty(true);
+    }
+    
+    public boolean isReleased()
+    {
+        return releaseDate.getTime() > 0 && releaseDate.getTime() < System.currentTimeMillis();
     }
     
     public int getEpisodeNumber()
@@ -63,19 +76,9 @@ public class TVEpisode
         return title;
     }
     
-    public boolean isWatched()
+    public Property<Boolean> getWatched()
     {
         return watched;
-    }
-    
-    public void setWatched(boolean watched)
-    {
-        if (this.watched != watched)
-        {
-            season.setDirty(true);
-            if (watchedChangeListener != null) watchedChangeListener.accept(watched);
-        }
-        this.watched = watched;
     }
     
     @Override
@@ -91,10 +94,5 @@ public class TVEpisode
         if (o == null || getClass() != o.getClass()) return false;
         TVEpisode episode = (TVEpisode) o;
         return episodeNumber == episode.episodeNumber && Objects.equal(season, episode.season);
-    }
-    
-    public void setWatchedChangedListener(Consumer<Boolean> watchedChangeListener)
-    {
-        this.watchedChangeListener = watchedChangeListener;
     }
 }

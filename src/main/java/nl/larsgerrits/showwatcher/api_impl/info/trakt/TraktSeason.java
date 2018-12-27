@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api_impl.trakt;
+package nl.larsgerrits.showwatcher.api_impl.info.trakt;
 
 import java.util.Date;
 

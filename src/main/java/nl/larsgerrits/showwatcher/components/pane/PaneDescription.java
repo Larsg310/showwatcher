@@ -41,7 +41,7 @@ public class PaneDescription extends AnchorPane
         AnchorPane.setLeftAnchor(title, 170D);
         
         description.setId("text");
-        description.setFont(new Font(18));
+        description.setFont(new Font(16));
         description.setWrappingWidth(width - 190);
         AnchorPane.setTopAnchor(description, 56D);
         AnchorPane.setLeftAnchor(description, 170D);
@@ -86,8 +86,9 @@ public class PaneDescription extends AnchorPane
         this.description.setText(description);
     }
     
+    @SuppressWarnings("deprecation")
     private void setReleaseDate(Date date)
     {
-        releaseDate.setText(String.format("Release Date: %02d/%02d/%04d %02d:%02d", date.getDate(), date.getMonth() + 1, date.getYear() + 1900, date.getHours(), date.getMinutes()));
+        releaseDate.setText(String.format("Release Date: %s", date.getTime() == 0 ? "Unknown" : String.format("%02d/%02d/%04d %02d:%02d", date.getDate(), date.getMonth() + 1, date.getYear() + 1900, date.getHours(), date.getMinutes())));
     }
 }

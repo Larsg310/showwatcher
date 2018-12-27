@@ -4,8 +4,9 @@ import com.google.common.base.Strings;
 import javafx.application.Platform;
 import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api_impl.trakt.TraktApi;
-import nl.larsgerrits.showwatcher.api_impl.trakt.TraktEpisode;
+import nl.larsgerrits.showwatcher.api_impl.info.trakt.TraktApi;
+import nl.larsgerrits.showwatcher.api_impl.info.trakt.TraktEpisode;
+import nl.larsgerrits.showwatcher.api_impl.info.trakt.TraktShow;
 import nl.larsgerrits.showwatcher.cache.DescriptionCache;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVShow;
@@ -21,13 +22,22 @@ public final class DescriptionManager
     
     public static void getShowDescription(TVShow show, Consumer<String> callback)
     {
-        if (DescriptionCache.hasShowDescription(show))
+        String description;
+        if (DescriptionCache.hasShowDescription(show)  && !Strings.isNullOrEmpty(description = DescriptionCache.getShowDescription(show)))
         {
-            callback.accept(DescriptionCache.getShowDescription(show));
+            callback.accept(description);
         }
         else
         {
             callback.accept(NO_DESCRIPTION);
+            Threading.IMAGE_THREAD.execute(() -> {
+                TraktShow e = TraktApi.getShow(show);
+                if (e != null && !Strings.isNullOrEmpty(e.getOverview()))
+                {
+                    Platform.runLater(() -> callback.accept(e.getOverview()));
+                    DescriptionCache.addShowDescription(show, e.getOverview());
+                }
+            });
         }
     }
     

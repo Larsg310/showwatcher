@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api_impl.piratebay;
+package nl.larsgerrits.showwatcher.api_impl.torrent.piratebay;
 
 import nl.larsgerrits.showwatcher.download.Torrent;
 import org.jsoup.Jsoup;
@@ -52,7 +52,7 @@ public class PirateBayScraper
                 }
             }
         }
-        catch (IOException ignored) {}
+        catch (IOException ignored) { /*can't connect, ignore*/}
         
         return result;
     }

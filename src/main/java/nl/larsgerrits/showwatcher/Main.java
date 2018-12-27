@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import nl.larsgerrits.showwatcher.api_impl.tmdb.IDMapper;
+import nl.larsgerrits.showwatcher.api_impl.info.tmdb.IDMapper;
 import nl.larsgerrits.showwatcher.manager.DescriptionManager;
 import nl.larsgerrits.showwatcher.manager.ShowManager;
 

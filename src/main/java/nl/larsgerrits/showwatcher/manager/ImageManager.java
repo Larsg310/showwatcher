@@ -4,7 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.api_impl.tmdb.TMDBApi;
+import nl.larsgerrits.showwatcher.api_impl.info.tmdb.TMDBApi;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 import nl.larsgerrits.showwatcher.show.TVShow;
@@ -20,8 +20,8 @@ import java.util.function.Consumer;
 public final class ImageManager
 {
     private static final String IMAGE_URL = "https://image.tmdb.org/t/p/w780";
-    private static final Image DEFAULT_IMAGE = new Image("@../../image/default.png");
-    private static final Image DEFAULT_IMAGE_WIDE = new Image("@../../image/default_wide.png");
+    private static final String DEFAULT_IMAGE = "/image/default.png";
+    private static final String DEFAULT_IMAGE_WIDE = "/image/default_wide.png";
     
     private ImageManager() {}
     
@@ -35,7 +35,7 @@ public final class ImageManager
         }
         else
         {
-            callback.accept(DEFAULT_IMAGE);
+            callback.accept(new Image(DEFAULT_IMAGE));
             Threading.IMAGE_THREAD.execute(() -> {
                 String posterPath = TMDBApi.getShowPoster(show);
                 downloadPoster(callback, path, posterPath);
@@ -53,7 +53,7 @@ public final class ImageManager
         }
         else
         {
-            callback.accept(DEFAULT_IMAGE);
+            callback.accept(new Image(DEFAULT_IMAGE));
             
             Threading.IMAGE_THREAD.execute(() -> {
                 String posterPath = TMDBApi.getSeasonPoster(season);
@@ -72,7 +72,7 @@ public final class ImageManager
         }
         else
         {
-            callback.accept(DEFAULT_IMAGE_WIDE);
+            callback.accept(new Image(DEFAULT_IMAGE_WIDE));
             
             Threading.IMAGE_THREAD.execute(() -> {
                 String posterPath = TMDBApi.getEpisodePoster(episode);
@@ -88,7 +88,7 @@ public final class ImageManager
             boolean downloaded = saveImage(IMAGE_URL + posterPath, path.toString());
             Platform.runLater(() -> {
                 if (downloaded) onDownloadCallback.accept(new Image("file:" + path));
-                else onDownloadCallback.accept(DEFAULT_IMAGE_WIDE);
+                else onDownloadCallback.accept(new Image(DEFAULT_IMAGE));
             });
         }
     }

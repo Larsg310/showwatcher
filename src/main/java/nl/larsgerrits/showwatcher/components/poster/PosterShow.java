@@ -38,5 +38,13 @@ public class PosterShow extends AnchorPane
     {
         text.setText(show.getTitle());
         ImageManager.getPosterURLForTVShow(show, imageView::setImage);
+        
+        show.getSeasons().forEach(s -> s.getEpisodes().forEach(e -> e.getWatched().addChangeListener(this::updateWatched)));
+        updateWatched(false, show.isCompletelyWatched());
+    }
+    
+    public void updateWatched(boolean old, boolean watched)
+    {
+        imageView.setEffect(watched ? PosterEpisode.GRAYSCALE_EFFECT : null);
     }
 }

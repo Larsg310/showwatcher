@@ -12,9 +12,13 @@ public class TMDBFindDeserializer implements JsonDeserializer<Integer>
     @Override
     public Integer deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
     {
-        try{
+        try
+        {
             return json.getAsJsonObject().get("tv_results").getAsJsonArray().get(0).getAsJsonObject().get("id").getAsInt();
-        }catch (IndexOutOfBoundsException e){
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            e.printStackTrace();
             return -1;
         }
     }

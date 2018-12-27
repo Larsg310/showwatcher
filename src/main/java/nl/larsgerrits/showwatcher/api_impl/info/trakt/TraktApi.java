@@ -1,10 +1,12 @@
-package nl.larsgerrits.showwatcher.api_impl.trakt;
+package nl.larsgerrits.showwatcher.api_impl.info.trakt;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import nl.larsgerrits.showwatcher.gson.trakt.TraktEpisodeDeserializer;
+import nl.larsgerrits.showwatcher.gson.trakt.TraktPopularDeserializer;
 import nl.larsgerrits.showwatcher.gson.trakt.TraktSeasonDeserializer;
+import nl.larsgerrits.showwatcher.gson.trakt.TraktShowDeserializer;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;
@@ -15,11 +17,16 @@ import java.util.*;
 public final class TraktApi
 {
     private static final Map<String, String> traktHeaders = new HashMap<>();
+    
+    private static final Gson showGson = new GsonBuilder().registerTypeAdapter(TraktShow.class, new TraktShowDeserializer()).create();
     private static final Gson seasonGson = new GsonBuilder().registerTypeAdapter(List.class, new TraktSeasonDeserializer()).create();
     private static final Gson episodeGson = new GsonBuilder().registerTypeAdapter(TraktEpisode.class, new TraktEpisodeDeserializer()).create();
+    private static final Gson popularGson = new GsonBuilder().registerTypeAdapter(List.class, new TraktPopularDeserializer()).create();
     
+    private static final Map<TVShow, TraktShow> showCache = new HashMap<>();
     private static final Map<TVShow, List<TraktSeason>> showSeasonCache = new HashMap<>();
     private static final Map<TVSeason, List<TraktEpisode>> seasonEpisodeCache = new HashMap<>();
+    private static final List<TVShow> popular = new ArrayList<>();
     
     static
     {
@@ -29,6 +36,24 @@ public final class TraktApi
     }
     
     private TraktApi() {}
+    
+    public static TraktShow getShow(TVShow show)
+    {
+        TraktShow traktShow = showCache.get(show);
+        if (traktShow == null)
+        {
+            traktShow = requestShow(show);
+            showCache.put(show, traktShow);
+        }
+        return traktShow;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static TraktShow requestShow(TVShow show)
+    {
+        String jsonResponse = HTTPUtils.get("https://api.trakt.tv/shows/" + show.getImdbId() + "?extended=full", traktHeaders);
+        return showGson.fromJson(jsonResponse, TraktShow.class);
+    }
     
     public static List<TraktSeason> getSeasons(TVShow show)
     {
@@ -88,5 +113,26 @@ public final class TraktApi
             }
         }
         return episodes;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static List<TVShow> getPopularShows(int page)
+    {
+        List<TVShow> shows = requestPopular(page);
+        if (shows != null) popular.addAll(shows);
+        
+        return new ArrayList<>(popular);
+        
+        // if (!popular.isEmpty()) return popular.get(page);
+        //
+        // List<TVShow> shows = requestPopular();
+        // if (shows != null) popular.addAll(shows);
+        // return popular;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static List<TVShow> requestPopular(int page)
+    {
+        return popularGson.fromJson(HTTPUtils.get("https://api.trakt.tv/shows/trending?page=" + (page + 1) + "&limit=100", traktHeaders), List.class);
     }
 }

@@ -6,10 +6,10 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.alerts.*;
 import javafx.application.Platform;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.download.TorrentCollector;
-import nl.larsgerrits.showwatcher.download.Download;
-import nl.larsgerrits.showwatcher.show.TVEpisode;
+import nl.larsgerrits.showwatcher.components.download.Download;
 import nl.larsgerrits.showwatcher.download.Torrent;
+import nl.larsgerrits.showwatcher.download.TorrentCollector;
+import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 
 import java.nio.file.Files;
@@ -24,6 +24,7 @@ public final class DownloadManager
 {
     private static Consumer<Download> downloadAddedCallback;
     private static Consumer<Download> downloadFinishedCallback;
+    private static Runnable canceled;
     
     private DownloadManager() {}
     
@@ -37,6 +38,11 @@ public final class DownloadManager
         DownloadManager.downloadFinishedCallback = downloadFinishedCallback;
     }
     
+    public static void setCanceledCallback(Runnable canceled)
+    {
+        DownloadManager.canceled = canceled;
+    }
+    
     public static void downloadEpisode(TVEpisode episode)
     {
         Threading.DOWNLOAD_THREAD.execute(() -> {
@@ -45,9 +51,11 @@ public final class DownloadManager
             String info = String.format("%s Episode %dx%02d", episode.getSeason().getShow().getTitle(), episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber());
             if (torrent != null)
             {
-                System.out.println("Downloading " + info);
+                System.out.println("Downloading " + info + "(" + torrent.getSeeds() + " seeds, " + torrent.getPeers() + " peers)");
                 Download download = downloadMagnet(episode, torrent.getMagnetUrl());
-                if (downloadAddedCallback != null) Platform.runLater(() -> downloadAddedCallback.accept(download));
+                System.out.println();
+                if (canceled != null && download == null) canceled.run();
+                else if (downloadAddedCallback != null) Platform.runLater(() -> downloadAddedCallback.accept(download));
             }
             else
             {
@@ -59,9 +67,9 @@ public final class DownloadManager
     
     private static Download downloadMagnet(TVEpisode episode, String magnetUrl)
     {
-        Download download = new Download(episode);
         try
         {
+            Download download = new Download(episode);
             SessionManager manager = new SessionManager();
             
             Path saveDir = FileUtils.getSaveDir(episode);
@@ -114,18 +122,18 @@ public final class DownloadManager
             
             waitForNodesInDHT(manager);
             byte[] data = manager.fetchMagnet(magnetUrl, 60);
-            TorrentInfo ti = TorrentInfo.bdecode(data);
             
+            TorrentInfo ti = TorrentInfo.bdecode(data);
             
             manager.download(ti, saveDir.toFile());
             
+            return download;
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        
-        return download;
+        return null;
     }
     
     private static void waitForNodesInDHT(final SessionManager s) throws InterruptedException

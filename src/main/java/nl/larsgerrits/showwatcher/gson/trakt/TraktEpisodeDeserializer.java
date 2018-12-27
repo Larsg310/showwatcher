@@ -1,7 +1,7 @@
 package nl.larsgerrits.showwatcher.gson.trakt;
 
 import com.google.gson.*;
-import nl.larsgerrits.showwatcher.api_impl.trakt.TraktEpisode;
+import nl.larsgerrits.showwatcher.api_impl.info.trakt.TraktEpisode;
 
 import java.lang.reflect.Type;
 import java.time.Instant;

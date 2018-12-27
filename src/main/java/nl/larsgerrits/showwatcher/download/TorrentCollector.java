@@ -1,8 +1,9 @@
 package nl.larsgerrits.showwatcher.download;
 
-import nl.larsgerrits.showwatcher.api_impl.ettv.ETTVApi;
-import nl.larsgerrits.showwatcher.api_impl.eztv.EZTVApi;
-import nl.larsgerrits.showwatcher.api_impl.piratebay.PirateBayApi;
+import nl.larsgerrits.showwatcher.api_impl.torrent.ettv.ETTVApi;
+import nl.larsgerrits.showwatcher.api_impl.torrent.eztv.EZTVApi;
+import nl.larsgerrits.showwatcher.api_impl.torrent.kat.KickassApi;
+import nl.larsgerrits.showwatcher.api_impl.torrent.piratebay.PirateBayApi;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 
 import java.util.ArrayList;
@@ -16,9 +17,11 @@ public class TorrentCollector
     
     static
     {
+        torrentCollectors.add(KickassApi::request);
         torrentCollectors.add(EZTVApi::request);
         torrentCollectors.add(ETTVApi::request);
         torrentCollectors.add(PirateBayApi::request);
+        
     }
     
     public static Torrent getTorrent(TVEpisode episode)
@@ -28,7 +31,7 @@ public class TorrentCollector
             List<Torrent> torrents = collector.apply(episode);
             if (torrents != null && !torrents.isEmpty())
             {
-                torrents.sort(Comparator.comparing(Torrent::getSeeds));
+                torrents.sort(Comparator.comparing(Torrent::getSeeds).reversed());
                 System.out.println(torrents.get(0).getMagnetUrl());
                 return torrents.get(0);
             }

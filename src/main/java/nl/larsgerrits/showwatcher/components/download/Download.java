@@ -1,12 +1,12 @@
-package nl.larsgerrits.showwatcher.download;
+package nl.larsgerrits.showwatcher.components.download;
 
 import com.jfoenix.controls.JFXProgressBar;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import nl.larsgerrits.showwatcher.controller.MainController;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 
 public class Download extends AnchorPane
@@ -29,7 +29,7 @@ public class Download extends AnchorPane
         progressBar.setPrefHeight(20);
         progressBar.setPrefWidth(140);
         progressBar.setId("bordered");
-        MainController.bindTooltip(progressBar, tooltip);
+        bindTooltip(progressBar, tooltip);
         AnchorPane.setBottomAnchor(progressBar, 8D);
         AnchorPane.setLeftAnchor(progressBar, 8D);
         
@@ -42,5 +42,16 @@ public class Download extends AnchorPane
             progressBar.setProgress(progress);
             tooltip.setText("Progress: " + String.format("%.2f", progress * 100).replace(',', '.') + '%');
         });
+    }
+    
+    
+    public static void bindTooltip(final Node node, final Tooltip tooltip)
+    {
+        node.setOnMouseEntered(event -> tooltip.show(node, event.getScreenX() + 10, event.getScreenY() + 25));
+        node.setOnMouseMoved(event -> {
+            tooltip.setAnchorX(event.getScreenX() + 10);
+            tooltip.setAnchorY(event.getScreenY() + 25);
+        });
+        node.setOnMouseExited(event -> tooltip.hide());
     }
 }

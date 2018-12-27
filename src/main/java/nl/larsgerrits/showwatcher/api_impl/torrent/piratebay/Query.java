@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api_impl.piratebay;
+package nl.larsgerrits.showwatcher.api_impl.torrent.piratebay;
 
 public class Query {
 

@@ -1,4 +1,4 @@
-package nl.larsgerrits.showwatcher.api_impl.ettv;
+package nl.larsgerrits.showwatcher.api_impl.torrent.ettv;
 
 import nl.larsgerrits.showwatcher.download.Torrent;
 import nl.larsgerrits.showwatcher.manager.ShowManager;

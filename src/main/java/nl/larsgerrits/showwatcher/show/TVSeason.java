@@ -38,6 +38,11 @@ public class TVSeason implements Iterable<TVEpisode>
         if (notify) getEpisodeAdded().accept(episode);
     }
     
+    public void setTotalEpisodes(int totalEpisodes)
+    {
+        this.totalEpisodes = totalEpisodes;
+    }
+    
     private Consumer<TVEpisode> getEpisodeAdded()
     {
         return episodeAdded == null ? t -> {} : episodeAdded;
@@ -108,6 +113,13 @@ public class TVSeason implements Iterable<TVEpisode>
     public void setDirty(boolean dirty)
     {
         this.dirty = dirty;
+        // if (dirty)
+        // {
+        //     Threading.FILE_THREAD.execute(() -> {
+        //         ShowManager.saveSeasonToDisk(this);
+        //         this.dirty = false;
+        //     });
+        // }
     }
     
     public boolean isFullyDownloaded()
@@ -118,12 +130,12 @@ public class TVSeason implements Iterable<TVEpisode>
     
     public boolean isWatched()
     {
-        return episodes.stream().allMatch(TVEpisode::isWatched);
+        return episodes.stream().allMatch(e -> e.getWatched().get());
     }
     
     public void setWatched(boolean watched)
     {
-        episodes.forEach(e -> e.setWatched(watched));
+        episodes.forEach(e -> e.getWatched().set(watched));
         setDirty(true);
     }
     
