@@ -1,5 +1,6 @@
 package nl.larsgerrits.showwatcher;
 
+import com.google.common.base.Strings;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 
 import javax.annotation.Nonnull;
@@ -8,7 +9,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class Settings
@@ -17,7 +20,7 @@ public final class Settings
     public static Path DEFAULT_PATH;
     
     @Nonnull
-    public static Path BASE_PATH;
+    public static List<Path> BASE_PATHS = new ArrayList<>();
     
     @Nonnull
     public static Path CACHE_PATH;
@@ -32,11 +35,23 @@ public final class Settings
         Path settingsPath = DEFAULT_PATH.resolve(Reference.SETTINGS_FILE);
         Map<String, String> settings = readSettings(settingsPath);
         
-        if (settings.containsKey("basePath")) BASE_PATH = Paths.get(settings.get("basePath"));
-        else BASE_PATH = DEFAULT_PATH;
+        if (settings.containsKey("basePath"))
+        {
+            String basePath = settings.get("basePath");
+            String[] basePaths = basePath.split(";");
+            for (String path : basePaths)
+            {
+                if (!Strings.isNullOrEmpty(path))
+                {
+                    BASE_PATHS.add(Paths.get(path));
+                }
+            }
+            
+            // BASE_PATH = Paths.get(settings.get("basePath"));
+        }
         
-        CACHE_PATH = BASE_PATH.resolve(Reference.CACHE_MAP);
-        COLLECTIONS_PATH = BASE_PATH.resolve(Reference.COLLECTIONS_MAP);
+        CACHE_PATH = BASE_PATHS.get(0).resolve(Reference.CACHE_MAP);
+        COLLECTIONS_PATH = BASE_PATHS.get(0).resolve(Reference.COLLECTIONS_MAP);
     }
     
     private static Map<String, String> readSettings(Path path)

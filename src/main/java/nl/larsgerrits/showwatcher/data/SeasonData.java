@@ -1,5 +1,6 @@
 package nl.larsgerrits.showwatcher.data;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,8 @@ public class SeasonData
     private int totalEpisodes;
     private long releaseDate;
     private List<EpisodeData> episodes;
+    
+    private transient Path basePath;
     
     public SeasonData()
     {
@@ -24,6 +27,16 @@ public class SeasonData
         this.totalEpisodes = totalEpisodes;
         this.releaseDate = releaseDate;
         this.episodes = episodes;
+    }
+    
+    public void setBasePath(Path basePath)
+    {
+        this.basePath = basePath;
+    }
+    
+    public Path getBasePath()
+    {
+        return basePath;
     }
     
     public List<EpisodeData> getEpisodeData()

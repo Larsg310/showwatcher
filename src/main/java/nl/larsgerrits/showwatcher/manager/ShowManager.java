@@ -32,7 +32,7 @@ public final class ShowManager
     {
         if (tvShows.isEmpty())
         {
-            FileUtils.loadShowsFromDisk(ShowManager::onSeasonDataLoad);
+            FileUtils.loadShowsFromDisks(ShowManager::onSeasonDataLoad);
         }
         return tvShows;
     }
@@ -41,7 +41,7 @@ public final class ShowManager
     {
         if (tvShowMap.isEmpty())
         {
-            FileUtils.loadShowsFromDisk(ShowManager::onSeasonDataLoad);
+            FileUtils.loadShowsFromDisks(ShowManager::onSeasonDataLoad);
         }
         return tvShowMap;
     }
@@ -56,18 +56,34 @@ public final class ShowManager
             tvShows.add(show);
             tvShows.sort(Comparator.comparing(TVShow::getTitle));
         }
+        int seasonNumber = seasonData.getSeason();
         
-        TVSeason season = new TVSeason(show, seasonData.getSeason(), path, seasonData.getTotalEpisodes(), seasonData.getReleaseDate());
+        TVSeason season;
+        if (show.hasSeason(seasonNumber))
+        {
+            season = show.getSeason(seasonNumber);
+        }
+        else
+        {
+            season = new TVSeason(show, seasonNumber, path, seasonData.getTotalEpisodes(), seasonData.getReleaseDate());
+        }
+        
         if (seasonData.getEpisodeData() != null)
         {
             for (EpisodeData episodeData : seasonData.getEpisodeData())
             {
                 Date date = new Date(episodeData.getReleaseDate());
-                TVEpisode episode = new TVEpisode(episodeData.getTitle(), episodeData.getEpisode(), Strings.isNullOrEmpty(episodeData.getFileName()) ? null : path.resolve(episodeData.getFileName()), date, season, episodeData.isWatched());
-                season.addEpisode(episode, false);
+                TVEpisode episode = season.hasEpisode(episodeData.getEpisode()) ? season.getEpisode(episodeData.getEpisode()) : new TVEpisode(episodeData.getTitle(), episodeData.getEpisode(), Strings.isNullOrEmpty(episodeData.getFileName()) ? null : path.resolve(episodeData.getFileName()), date, season, episodeData.isWatched());
+                if (!season.hasEpisode(episode.getEpisodeNumber()))
+                {
+                    season.addEpisode(episode, false);
+                }
             }
         }
-        show.addSeason(season, false);
+        if (!show.hasSeason(seasonNumber))
+        {
+            show.addSeason(season, false);
+        }
         return season;
     }
     
@@ -84,19 +100,23 @@ public final class ShowManager
                     {
                         TVSeason tvSeason = new TVSeason(show, season.getSeasonNumber(), null, season.getEpisodeCount(), season.getReleaseDate());
                         show.addSeason(tvSeason, true);
+                        System.out.println("    Added season " + season.getSeasonNumber());
+                        tvSeason.setDirty(true);
                     }
                     else
                     {
                         TVSeason tvSeason = show.getSeason(season.getSeasonNumber());
-                        if (tvSeason.getReleaseDate().getTime() == 0)
+                        if (tvSeason.getReleaseDate().getTime() == 0 && season.getReleaseDate().getTime() != 0)
                         {
                             tvSeason.setReleaseDate(season.getReleaseDate());
+                            System.out.println("    Added release date for season " + season.getSeasonNumber());
                         }
                         if (tvSeason.getTotalEpisodes() != season.getEpisodeCount())
                         {
+                            System.out.println("    Updated episode count for season " + season.getSeasonNumber() + ": " + tvSeason.getTotalEpisodes() + " -> " + season.getEpisodeCount());
                             tvSeason.setTotalEpisodes(season.getEpisodeCount());
                         }
-                        // if(tvSeason.)
+                        tvSeason.setDirty(true);
                     }
                 }
             }
@@ -111,16 +131,42 @@ public final class ShowManager
                         {
                             TVEpisode tvEpisode = new TVEpisode(episode.getTitle(), episode.getEpisodeNumber(), null, episode.getReleaseDate(), season, false);
                             season.addEpisode(tvEpisode, true);
-                            // season.setDirty(true);
+                            season.setDirty(true);
+                            System.out.println("    Added season " + season.getSeasonNumber() + " episode " + tvEpisode.getEpisodeNumber());
                         }
                         else
                         {
                             TVEpisode tvEpisode = season.getEpisode(episode.getEpisodeNumber());
                             
-                            tvEpisode.setReleaseDate(episode.getReleaseDate());
-                            tvEpisode.setTitle(episode.getTitle());
+                            if (tvEpisode.getReleaseDate().getTime() == 0 && episode.getReleaseDate().getTime() != 0)
+                            {
+                                tvEpisode.setReleaseDate(episode.getReleaseDate());
+                                System.out.println("    Added release date for season " + season.getSeasonNumber() + " episode " + tvEpisode.getEpisodeNumber());
+                            }
+                            if (Strings.isNullOrEmpty(tvEpisode.getTitle()) && !Strings.isNullOrEmpty(episode.getTitle()))
+                            {
+                                System.out.println("    Updated episode title for season " + season.getSeasonNumber() + " episode " + tvEpisode.getEpisodeNumber() + ": " + tvEpisode.getTitle() + " -> " + episode.getTitle());
+                                tvEpisode.setTitle(episode.getTitle());
+                            }
+                            season.setDirty(true);
                         }
                     }
+                    
+                    season.forEach(e -> {
+                        if (e.getVideoFilePath() == null && e.isReleased())
+                        {
+                            // Threading.DOWNLOAD_THREAD.execute(() -> {
+                            //     Download download = DownloadManager.tryToDownloadEpisode(e);
+                            //
+                            //     if (download != null)
+                            //     {
+                            //         DownloadManager.addToDownloadableList(download);
+                            //     }
+                            // });
+                            System.out.println("    Episode " + e.getSeason().getSeasonNumber() + "x" + String.format("%02d", e.getEpisodeNumber()) + " has no file associated");
+                            DownloadManager.addToDownloadableList(e);
+                        }
+                    });
                 }
             }
         });
@@ -136,7 +182,7 @@ public final class ShowManager
     {
         tvShows.stream().flatMap(show -> show.getSeasons().stream())//
                .filter(TVSeason::isDirty)//
-               .filter(s -> s.getPath() != null).forEach(ShowManager::saveSeasonToDisk);
+               .forEach(ShowManager::saveSeasonToDisk);
     }
     
     @Nullable
@@ -166,8 +212,7 @@ public final class ShowManager
                 {
                     List<TVShow> popular = TraktApi.getPopularShows(page);
                     Set<String> existingIds = ShowManager.getTVShowMap().keySet();
-                    popular.stream().filter(s -> !existingIds.contains(s.getImdbId())).forEach(s -> Platform.runLater(() -> addShow.accept(s))
-                    );
+                    popular.stream().filter(s -> !existingIds.contains(s.getImdbId())).forEach(s -> Platform.runLater(() -> addShow.accept(s)));
                 }
             });
         }

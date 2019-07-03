@@ -61,6 +61,10 @@ public class Torrent
         return seeds;
     }
     
+    public int getSeedsPlusPeers(){
+        return getSeeds() + getPeers();
+    }
+    
     public long getSizeInBytes()
     {
         return sizeInBytes;

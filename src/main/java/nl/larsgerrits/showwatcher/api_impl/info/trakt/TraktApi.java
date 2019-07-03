@@ -102,7 +102,8 @@ public final class TraktApi
         List<TraktEpisode> episodes = new ArrayList<>();
         for (int episode = 0; episode < season.getTotalEpisodes(); episode++)
         {
-            String jsonResponse = HTTPUtils.get("https://api.trakt.tv/shows/" + season.getShow().getImdbId() + "/seasons/" + season.getSeasonNumber() + "/episodes/" + episode + "?extended=full", traktHeaders);
+            String url = "https://api.trakt.tv/shows/" + season.getShow().getImdbId() + "/seasons/" + season.getSeasonNumber() + "/episodes/" + (episode+1) + "?extended=full";
+            String jsonResponse = HTTPUtils.get(url, traktHeaders);
             if (!Strings.isNullOrEmpty(jsonResponse))
             {
                 TraktEpisode e = episodeGson.fromJson(jsonResponse, TraktEpisode.class);

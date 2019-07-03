@@ -11,9 +11,6 @@ import nl.larsgerrits.showwatcher.manager.ShowManager;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 
-import java.awt.*;
-import java.io.IOException;
-
 public class PaneAction extends AnchorPane
 {
     public static final FontAwesomeIconView EYE_CLOSED = new FontAwesomeIconView(FontAwesomeIcon.EYE_SLASH, "40px");
@@ -69,17 +66,32 @@ public class PaneAction extends AnchorPane
     
     private void setActionButtonDownloadSeason(TVSeason season)
     {
-        actionButton.setDisable(season.getPath() != null);
-        actionButton.setVisible(season.getPath() == null);
+        actionButton.setDisable(true);
+        actionButton.setVisible(false);
         
         if (season.getPath() == null)
         {
             actionButton.setGraphic(DOWNLOAD);
-            actionButton.setText("Download Season");
+            actionButton.setText("Save Season");
             actionButton.setOnMouseClicked(e -> {
                 ShowManager.saveSeasonToDisk(season);
                 setActionButtonDownloadSeason(season);
             });
+            actionButton.setDisable(false);
+            actionButton.setVisible(true);
+    
+        }
+        else
+        {
+            for(TVEpisode episode : season){
+                if(episode.getVideoFilePath()==null){
+                    actionButton.setGraphic(DOWNLOAD);
+                    actionButton.setText("Download Season " + season.getSeasonNumber());
+                    actionButton.setOnMouseClicked(e -> season.getEpisodes().stream().filter(ep -> ep.getVideoFilePath() == null).forEach(DownloadManager::downloadEpisode));
+                    actionButton.setDisable(false);
+                    actionButton.setVisible(true);
+                }
+            }
         }
     }
     
@@ -96,23 +108,13 @@ public class PaneAction extends AnchorPane
         }
         else
         {
-            if (episode.getVideoFile() != null)
+            if (episode.getVideoFilePath() != null)
             {
                 actionButton.setDisable(false);
                 actionButton.setVisible(true);
                 actionButton.setGraphic(PLAY);
                 actionButton.setText("Play Episode");
-                actionButton.setOnMouseClicked(e -> {
-                    episode.getWatched().set(true);
-                    try
-                    {
-                        Desktop.getDesktop().open(episode.getVideoFile().toFile());
-                    }
-                    catch (IOException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                });
+                actionButton.setOnMouseClicked(e -> episode.play());
             }
             else
             {

@@ -18,7 +18,7 @@ public class TMDBFindDeserializer implements JsonDeserializer<Integer>
         }
         catch (IndexOutOfBoundsException e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             return -1;
         }
     }

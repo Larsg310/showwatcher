@@ -14,8 +14,15 @@ public class TraktShowDeserializer implements JsonDeserializer<TraktShow>
     @Override
     public TraktShow deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
     {
-        String overview = json.getAsJsonObject().get("overview").getAsString();
-        
-        return new TraktShow(overview);
+        try
+        {
+            String overview = json.getAsJsonObject().get("overview").isJsonNull() ? "" : json.getAsJsonObject().get("overview").getAsString();
+            return new TraktShow(overview);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return new TraktShow("");
     }
 }

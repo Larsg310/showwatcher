@@ -11,8 +11,10 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 public final class HTTPUtils
@@ -56,7 +58,7 @@ public final class HTTPUtils
         return "";
     }
     
-    public static Stream<String> getFromZip(String urlString)
+    public static List<String> getOrDownloadFile(String urlString)
     {
         try
         {
@@ -96,13 +98,13 @@ public final class HTTPUtils
                 Files.delete(gzipPath);
             }
             
-            return Files.lines(path);
+            return Files.lines(path).collect(Collectors.toList());
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
-        return Stream.of();
+        return new ArrayList<>();
     }
     
     private static HttpURLConnection getConnection(String url, Map<String, String> headers) throws IOException

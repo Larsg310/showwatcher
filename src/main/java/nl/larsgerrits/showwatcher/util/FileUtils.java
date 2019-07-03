@@ -7,24 +7,22 @@ import nl.larsgerrits.showwatcher.Settings;
 import nl.larsgerrits.showwatcher.data.EpisodeData;
 import nl.larsgerrits.showwatcher.data.SeasonData;
 import nl.larsgerrits.showwatcher.gson.show.ShowCollectionDeserializer;
-import nl.larsgerrits.showwatcher.show.TVEpisodeCollection;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
+import nl.larsgerrits.showwatcher.show.TVEpisodeCollection;
 import nl.larsgerrits.showwatcher.show.TVSeason;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -34,31 +32,36 @@ public class FileUtils
     private static final Gson COLLECTION_GSON = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(TVEpisodeCollection.class, new ShowCollectionDeserializer()).create();
     
     private static final Pattern DIACRITICS_AND_FRIENDS = Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
+    private static final Pattern EPISODE = Pattern.compile(".*([Ss](\\d{1,2})[Ee](\\d{1,2})).*");
     
-    public static void loadShowsFromDisk(@Nonnull BiFunction<Path, SeasonData, TVSeason> seasonDataConsumer)
+    public static void loadShowsFromDisks(@Nonnull BiFunction<Path, SeasonData, TVSeason> seasonDataConsumer)
     {
-        try (DirectoryStream<Path> showPaths = Files.newDirectoryStream(Settings.BASE_PATH))
+        for (Path basePath : Settings.BASE_PATHS)
         {
-            for (Path path : showPaths)
+            try (DirectoryStream<Path> showPaths = Files.newDirectoryStream(basePath))
             {
-                if (Files.exists(path.resolve(Reference.SEASON_INFO_FILE)))
+                for (Path path : showPaths)
                 {
-                    SeasonData data = parseSeasonData(path);
-                    if (data != null)
+                    if (Files.exists(path.resolve(Reference.SEASON_INFO_FILE)))
                     {
-                        boolean result = checkSeasonData(data);
-                        TVSeason season = seasonDataConsumer.apply(path, data);
-                        if (result) season.setDirty(true);
+                        SeasonData data = parseSeasonData(path);
+                        if (data != null)
+                        {
+                            data.setBasePath(basePath);
+                            boolean result = checkSeasonData(data);
+                            TVSeason season = seasonDataConsumer.apply(path, data);
+                            if (result) season.setDirty(true);
+                        }
                     }
                 }
             }
+            catch (IOException e) { e.printStackTrace();}
         }
-        catch (IOException e) { e.printStackTrace();}
     }
     
     private static boolean checkSeasonData(SeasonData data)
     {
-        Path seasonPath = Settings.BASE_PATH.resolve(String.format("%s_season_%d", getSimplifiedName(data.getTitle()), data.getSeason()));
+        Path seasonPath = data.getBasePath().resolve(String.format("%s_season_%d", getSimplifiedName(data.getTitle()), data.getSeason()));
         boolean result = false;
         
         if (data.getEpisodeData() != null)
@@ -75,6 +78,38 @@ public class FileUtils
                 {
                     episode.setFileName(correctFileName);
                     result = true;
+                }
+                else
+                {
+                    try (DirectoryStream<Path> stream = Files.newDirectoryStream(seasonPath))
+                    {
+                        for (Path entry : stream)
+                        {
+                            String fileName = entry.getFileName().toString();
+                            Matcher matcher = EPISODE.matcher(fileName);
+                            if (matcher.matches())
+                            {
+                                String seasonText = matcher.group(2);
+                                String episodeText = matcher.group(3);
+                                
+                                int seasonNumber = Integer.parseInt(seasonText);
+                                int episodeNumber = Integer.parseInt(episodeText);
+                                
+                                if (seasonNumber == data.getSeason() && episodeNumber == episode.getEpisode())
+                                {
+                                    Path newPath = Paths.get(entry.toString().replace(fileName, correctFileName));
+                                    System.out.println();
+                                    Files.move(entry, newPath);
+                                    episode.setFileName(correctFileName);
+                                    result = true;
+                                }
+                            }
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -143,22 +178,33 @@ public class FileUtils
         List<EpisodeData> episodeData = new ArrayList<>();
         for (TVEpisode episode : season.getEpisodes())
         {
-            episodeData.add(new EpisodeData(episode.getEpisodeNumber(), episode.getTitle(), episode.getVideoFile() == null ? "" : episode.getVideoFile().getFileName().toString(), episode.getReleaseDate() == null ? 0L : episode.getReleaseDate().getTime(), episode.getWatched().get()));
+            episodeData.add(new EpisodeData(episode.getEpisodeNumber(), episode.getTitle(), episode.getVideoFilePath() == null ? "" : episode.getVideoFilePath().getFileName().toString(), episode.getReleaseDate() == null ? 0L : episode.getReleaseDate().getTime(), episode.getWatched().get()));
         }
         SeasonData data = new SeasonData(season.getShow().getTitle(), season.getShow().getImdbId(), season.getSeasonNumber(), season.getTotalEpisodes(), season.getReleaseDate() == null ? 0L : season.getReleaseDate().getTime(), episodeData);
         
-        File dir = new File(Settings.BASE_PATH + File.separator + getSimplifiedName(season.getShow().getTitle()) + "_season_" + season.getSeasonNumber());
+        Path seasonPath = season.getPath();
+        if (seasonPath == null) seasonPath = getSaveDir(season);
+        if (seasonPath == null) return null;
+        try
+        {
+            if (Files.notExists(seasonPath)) Files.createDirectory(seasonPath);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
         
-        if (!dir.exists()) dir.mkdir();
+        Path path = seasonPath.resolve(Reference.SEASON_INFO_FILE);
         
-        Path path = dir.toPath().resolve(Reference.SEASON_INFO_FILE);
         try (FileWriter writer = new FileWriter(path.toFile()))
         {
             writer.write(GSON.toJson(data));
         }
-        catch (Exception e)
+        catch (IOException e)
         {
             e.printStackTrace();
+            return null;
         }
         return path;
     }
@@ -211,9 +257,22 @@ public class FileUtils
         catch (IOException e) {e.printStackTrace(); }
     }
     
-    public static Path getSaveDir(TVEpisode episode)
+    public static Path getSaveDir(TVSeason season)
     {
-        return Settings.BASE_PATH.resolve(String.format("%s_season_%d", getSimplifiedName(episode.getSeason().getShow().getTitle()), episode.getSeason().getSeasonNumber()));
+        for (Path basePath : Settings.BASE_PATHS)
+        {
+            try
+            {
+                FileStore fileStore = Files.getFileStore(basePath);
+                if (fileStore.getUsableSpace() < 10000000000L) continue;
+            }
+            catch (IOException e)
+            {
+                continue;
+            }
+            return basePath.resolve(String.format("%s_season_%d", getSimplifiedName(season.getShow().getTitle()), season.getSeasonNumber()));
+        }
+        return null;
     }
     
     public static String getEpisodeFileName(int episode, String title)

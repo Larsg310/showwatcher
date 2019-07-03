@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import nl.larsgerrits.showwatcher.manager.DownloadManager;
 import nl.larsgerrits.showwatcher.manager.ImageManager;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
 
@@ -24,10 +25,12 @@ public class PosterEpisode extends AnchorPane
     
     private Consumer<TVEpisode> episodeSelectedListener;
     
+    private long lastClicked;
+    
     public PosterEpisode(TVEpisode episode, Consumer<TVEpisode> episodeSelectedListener)
     {
         this.episode = episode;
-        this.episodeSelectedListener = episodeSelectedListener == null? e -> {} : episodeSelectedListener;
+        this.episodeSelectedListener = episodeSelectedListener == null ? e -> {} : episodeSelectedListener;
         episode.getWatched().addChangeListener(this::updateWatched);
         
         setPrefHeight(155);
@@ -50,9 +53,9 @@ public class PosterEpisode extends AnchorPane
         
         updateWatched(false, episode.getWatched().get());
         
-        setLeftAnchor(imageView, 10D);
-        setRightAnchor(imageView, 10D);
-        setTopAnchor(imageView, 10D);
+        AnchorPane.setLeftAnchor(imageView, 10D);
+        AnchorPane.setRightAnchor(imageView, 10D);
+        AnchorPane.setTopAnchor(imageView, 10D);
         
         getChildren().addAll(imageView, text);
     }
@@ -60,6 +63,18 @@ public class PosterEpisode extends AnchorPane
     private void onClicked()
     {
         if (episodeSelectedListener != null) episodeSelectedListener.accept(episode);
+        
+        long clicked = System.currentTimeMillis();
+        
+        if (clicked - lastClicked < 500)
+        {
+            if (episode.getVideoFilePath() != null)
+            {
+                DownloadManager.downloadEpisode(episode);
+            }
+            else episode.play();
+        }
+        lastClicked = clicked;
     }
     
     private void setImage(Image image)

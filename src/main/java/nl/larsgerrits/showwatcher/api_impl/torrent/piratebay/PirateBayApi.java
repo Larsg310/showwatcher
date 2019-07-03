@@ -14,7 +14,7 @@ public final class PirateBayApi
     public static List<Torrent> request(TVEpisode e)
     {
         Query query = constructQuery(e);
-        // System.out.println("URL: "+query.TranslateToUrl());
+        System.out.println("URL: "+query.TranslateToUrl());
         return PirateBayScraper.search(query, e.getSeason().getSeasonNumber(), e.getEpisodeNumber());
     }
 

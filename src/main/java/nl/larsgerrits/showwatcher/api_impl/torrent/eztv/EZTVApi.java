@@ -8,10 +8,7 @@ import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.download.Torrent;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class EZTVApi
@@ -25,12 +22,12 @@ public final class EZTVApi
     @SuppressWarnings("unchecked")
     public static List<Torrent> request(TVEpisode episode)
     {
-        List<Torrent> torrents = torrentMap.get(episode.getSeason().getShow());
-        if (torrents == null)
+        List<Torrent> torrents = torrentMap.computeIfAbsent(episode.getSeason().getShow(), k -> new ArrayList<>());
+        if (torrents.isEmpty())
         {
-            String jsonResponse = HTTPUtils.get("https://eztv.ag/api/get-torrents?imdb_id=" + episode.getSeason().getShow().getImdbId().replace("tt", ""));
-            torrents = gson.fromJson(jsonResponse, List.class);
-            torrentMap.put(episode.getSeason().getShow(), torrents);
+            String jsonResponse = HTTPUtils.get("https://eztv.tf/api/get-torrents?imdb_id=" + episode.getSeason().getShow().getImdbId().replace("tt", ""));
+            torrents.addAll(gson.fromJson(jsonResponse, List.class));
+            torrentMap.get(episode.getSeason().getShow()).addAll(torrents);
         }
         
         torrents.sort(Comparator.comparing(Torrent::getSeeds));

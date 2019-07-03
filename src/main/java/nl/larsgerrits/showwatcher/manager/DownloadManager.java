@@ -6,75 +6,138 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.alerts.*;
 import javafx.application.Platform;
 import nl.larsgerrits.showwatcher.Threading;
-import nl.larsgerrits.showwatcher.components.download.Download;
+import nl.larsgerrits.showwatcher.components.pane.DownloadablePane;
+import nl.larsgerrits.showwatcher.components.poster.PosterDownload;
+import nl.larsgerrits.showwatcher.download.Download;
 import nl.larsgerrits.showwatcher.download.Torrent;
 import nl.larsgerrits.showwatcher.download.TorrentCollector;
 import nl.larsgerrits.showwatcher.show.TVEpisode;
+import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public final class DownloadManager
 {
-    private static Consumer<Download> downloadAddedCallback;
-    private static Consumer<Download> downloadFinishedCallback;
-    private static Runnable canceled;
+    private static AtomicBoolean downloading = new AtomicBoolean(false);
+    
+    private static Consumer<PosterDownload> downloadStartedCallback = (p) -> {
+        System.out.println("Download started");
+    };
+    private static Consumer<PosterDownload> downloadFinishedCallback = (p) -> {
+        downloading.set(false);
+        System.out.println("Download finished...");
+        refresh();
+    };
+    private static Consumer<PosterDownload> downloadFailedCallback = (p) -> {
+        downloading.set(false);
+        System.out.println("Download failed...");
+        refresh();
+    };
+    private static Consumer<PosterDownload> downloadCanceledCallback = (p) -> {
+        System.out.println("Download cancelled...");
+        refresh();
+    };
+    private static Consumer<DownloadablePane> addDownloadablePaneCallback = (p) -> {};
+    private static Consumer<DownloadablePane> removeDownloadablePaneCallback = (p) -> {};
+    
+    private static List<Download> downloadList = new ArrayList<>();
+    
+    private static Map<TVShow, DownloadablePane> downloadablePaneMap = new HashMap<>();
     
     private DownloadManager() {}
     
-    public static void setDownloadAddedCallback(Consumer<Download> downloadCallback)
+    public static void addDownloadAddedCallback(Consumer<PosterDownload> downloadStartedCallback)
     {
-        DownloadManager.downloadAddedCallback = downloadCallback;
+        DownloadManager.downloadStartedCallback = downloadStartedCallback.andThen(DownloadManager.downloadStartedCallback);
     }
     
-    public static void setDownloadFinishedCallback(Consumer<Download> downloadFinishedCallback)
+    public static void addDownloadFinishedCallback(Consumer<PosterDownload> downloadFinishedCallback)
     {
-        DownloadManager.downloadFinishedCallback = downloadFinishedCallback;
+        DownloadManager.downloadFinishedCallback = downloadFinishedCallback.andThen(DownloadManager.downloadFinishedCallback);
     }
     
-    public static void setCanceledCallback(Runnable canceled)
+    public static void addDownloadFailedCallback(Consumer<PosterDownload> downloadFailedCallback)
     {
-        DownloadManager.canceled = canceled;
+        DownloadManager.downloadFailedCallback = downloadFailedCallback.andThen(DownloadManager.downloadFailedCallback);
+    }
+    
+    public static void addDownloadCanceledCallback(Consumer<PosterDownload> downloadCanceledCallback)
+    {
+        DownloadManager.downloadCanceledCallback = downloadCanceledCallback.andThen(DownloadManager.downloadCanceledCallback);
+    }
+    
+    public static void addDownloadablePaneCallback(Consumer<DownloadablePane> addDownloadablePaneCallback)
+    {
+        DownloadManager.addDownloadablePaneCallback = addDownloadablePaneCallback.andThen(DownloadManager.addDownloadablePaneCallback);
+    }
+    
+    public static void removeDownloadablePaneCallback(Consumer<DownloadablePane> removeDownloadablePaneCallback)
+    {
+        DownloadManager.removeDownloadablePaneCallback = removeDownloadablePaneCallback.andThen(DownloadManager.removeDownloadablePaneCallback);
     }
     
     public static void downloadEpisode(TVEpisode episode)
     {
-        Threading.DOWNLOAD_THREAD.execute(() -> {
-            Torrent torrent = TorrentCollector.getTorrent(episode);
+        Threading.API_THREAD.execute(() -> {
             
-            String info = String.format("%s Episode %dx%02d", episode.getSeason().getShow().getTitle(), episode.getSeason().getSeasonNumber(), episode.getEpisodeNumber());
+            // downloadList.add(episode);
+            
+            Torrent torrent = TorrentCollector.getTorrent(episode);
             if (torrent != null)
             {
-                System.out.println("Downloading " + info + "(" + torrent.getSeeds() + " seeds, " + torrent.getPeers() + " peers)");
-                Download download = downloadMagnet(episode, torrent.getMagnetUrl());
-                System.out.println();
-                if (canceled != null && download == null) canceled.run();
-                else if (downloadAddedCallback != null) Platform.runLater(() -> downloadAddedCallback.accept(download));
-            }
-            else
-            {
-                System.out.println("Failed downloading " + info);
-                downloadFinishedCallback.accept(null);
+                Download download = new Download(episode, torrent);
+                PosterDownload downloadPoster = new PosterDownload(download);
+                
+                Platform.runLater(() -> downloadStartedCallback.accept(downloadPoster));
+                downloadList.add(download);
+                
+                refresh();
             }
         });
     }
     
-    private static Download downloadMagnet(TVEpisode episode, String magnetUrl)
+    private static void refresh()
     {
+        if (!downloading.get() && !downloadList.isEmpty())
+        {
+            downloading.set(true);
+            Download download = downloadList.remove(0);
+            
+            Torrent torrent = download.getTorrent();
+            
+            String info = String.format("%s Episode %dx%02d", download.getEpisode().getSeason().getShow().getTitle(), download.getEpisode().getSeason().getSeasonNumber(), download.getEpisode().getEpisodeNumber());
+            if (torrent != null)
+            {
+                System.out.println("Downloading " + info + "(" + download.getPeers() + " peers, " + download.getSeeds() + " seeds)");
+                Threading.DOWNLOAD_THREAD.execute(() -> downloadMagnet(download, torrent));
+            }
+        }
+    }
+    
+    private static void downloadMagnet(Download download, Torrent torrent)
+    {
+        TVEpisode episode = download.getEpisode();
+        
         try
         {
-            Download download = new Download(episode);
-            SessionManager manager = new SessionManager();
+            download.setSessionManager(new SessionManager());
+            download.setSaveDir(FileUtils.getSaveDir(episode.getSeason()));
             
-            Path saveDir = FileUtils.getSaveDir(episode);
+            if (download.getSaveDir() == null)
+            {
+                Platform.runLater(() -> downloadFailedCallback.accept(download.getPoster()));
+                return;
+            }
             
-            if (Files.notExists(saveDir)) Files.createDirectory(saveDir);
+            if (Files.notExists(download.getSaveDir())) Files.createDirectory(download.getSaveDir());
             
             AlertListener showListener = new AlertListener()
             {
@@ -100,8 +163,8 @@ public final class DownloadManager
                         case TORRENT_FINISHED:
                             ((TorrentFinishedAlert) alert).handle().pause();
                             // System.out.println("Finished download!" + (fileName));
-                            episode.setVideoFile(episode.getSeason().getPath().resolve(fileName));
-                            if (downloadFinishedCallback != null) Platform.runLater(() -> downloadFinishedCallback.accept(download));
+                            episode.setVideoFile(download.getSaveDir().resolve(fileName));
+                            Platform.runLater(() -> downloadFinishedCallback.accept(download.getPoster()));
                             break;
                         case BLOCK_FINISHED:
                             double progress = ((BlockFinishedAlert) alert).handle().status().progress();
@@ -117,26 +180,27 @@ public final class DownloadManager
                 }
             };
             
-            manager.addListener(showListener);
-            manager.start();
+            download.getSessionManager().addListener(showListener);
+            download.getSessionManager().start();
             
-            waitForNodesInDHT(manager);
-            byte[] data = manager.fetchMagnet(magnetUrl, 60);
-            
-            TorrentInfo ti = TorrentInfo.bdecode(data);
-            
-            manager.download(ti, saveDir.toFile());
-            
-            return download;
+            if (waitForNodesInDHT(download.getSessionManager()))
+            {
+                byte[] data = download.getSessionManager().fetchMagnet(torrent.getMagnetUrl(), 60);
+                
+                TorrentInfo ti = TorrentInfo.bdecode(data);
+                
+                download.getSessionManager().download(ti, download.getSaveDir().toFile());
+            }
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Platform.runLater(() -> downloadFailedCallback.accept(download.getPoster()));
+            System.out.println("Download failed...");
+            refresh();
         }
-        return null;
     }
     
-    private static void waitForNodesInDHT(final SessionManager s) throws InterruptedException
+    private static boolean waitForNodesInDHT(final SessionManager s) throws InterruptedException
     {
         final CountDownLatch signal = new CountDownLatch(1);
         
@@ -155,7 +219,47 @@ public final class DownloadManager
             }
         }, 0, 1000);
         
-        boolean r = signal.await(60, TimeUnit.SECONDS);
-        if (!r) System.exit(0);
+        return signal.await(60, TimeUnit.SECONDS);
+    }
+    
+    public static void addToDownloadableList(TVEpisode episode)
+    {
+        TVShow show = episode.getSeason().getShow();
+        DownloadablePane pane = downloadablePaneMap.computeIfAbsent(show, s -> {
+            DownloadablePane newPane = new DownloadablePane(s);
+            Platform.runLater(() -> addDownloadablePaneCallback.accept(newPane));
+            return newPane;
+        });
+        pane.addEpisode(episode);
+    }
+    
+    public static void cancelDownload(PosterDownload poster)
+    {
+        if (poster.getDownload().getSessionManager() != null)
+        {
+            downloading.set(false);
+            Threading.DOWNLOAD_THREAD.execute(() -> {
+                poster.getDownload().getSessionManager().stop();
+                try
+                {
+                    TVEpisode episode = poster.getDownload().getEpisode();
+                    String fileName = FileUtils.getEpisodeFileName(episode.getEpisodeNumber(), episode.getTitle());
+                    Path filePath = poster.getDownload().getSaveDir().resolve(fileName);
+                    if (Files.exists(filePath))
+                    {
+                        Files.delete(filePath);
+                    }
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            });
+        }
+        else
+        {
+            downloadList.remove(poster.getDownload());
+        }
+        downloadCanceledCallback.accept(poster);
     }
 }

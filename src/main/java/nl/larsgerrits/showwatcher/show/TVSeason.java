@@ -125,7 +125,8 @@ public class TVSeason implements Iterable<TVEpisode>
     public boolean isFullyDownloaded()
     {
         if (episodes.isEmpty()) return false;
-        return episodes.stream().allMatch(episode -> episode.getVideoFile() != null);
+        if (episodes.size() < getTotalEpisodes()) return false;
+        return episodes.stream().allMatch(episode -> episode.getVideoFilePath() != null);
     }
     
     public boolean isWatched()

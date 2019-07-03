@@ -7,24 +7,41 @@ import nl.larsgerrits.showwatcher.show.TVShow;
 import nl.larsgerrits.showwatcher.util.FileUtils;
 import nl.larsgerrits.showwatcher.util.HTTPUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ETTVApi
 {
     private static final Pattern SEASON_EPISODE_PATTERN = Pattern.compile(".*S(\\d{2})E(\\d{2}).*");
     
-    private static final String TRACKERS = String.join("&tr=", new String[]{"udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce", "udp%3A%2F%2F9.rarbg.to%3A2710%2Fannounce", "udp%3A%2F%2F9.rarbg.me%3A2710%2Fannounce", "udp%3A%2F%2FIPv6.open-internet.nl%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce", "udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce", "udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce", "udp%3A%2F%2Feddie4.nl%3A6969%2Fannounce", "udp%3A%2F%2Fshadowshq.yi.org%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce", "udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce", "udp%3A%2F%2Finferno.demonoid.pw%3A3391%2Fannounce", "udp%3A%2F%2Fipv4.tracker.harry.lu%3A80%2Fannounce", "udp%3A%2F%2Fpeerfect.org%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.pirateparty.gr%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.vanitycore.co%3A6969%2Fannounce", "udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce", "udp%3A%2F%2Ftracker.torrent.eu.org%3A451", "udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce", "udp%3A%2F%2Ftracker.open-internet.nl%3A6969%2Fannounce"});
+    public static final String TRACKERS = String.join("&tr=", new String[]{"udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce", "udp%3A%2F%2F9.rarbg.to%3A2710%2Fannounce", "udp%3A%2F%2F9.rarbg.me%3A2710%2Fannounce", "udp%3A%2F%2FIPv6.open-internet.nl%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce", "udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce", "udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce", "udp%3A%2F%2Feddie4.nl%3A6969%2Fannounce", "udp%3A%2F%2Fshadowshq.yi.org%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce", "udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce", "udp%3A%2F%2Finferno.demonoid.pw%3A3391%2Fannounce", "udp%3A%2F%2Fipv4.tracker.harry.lu%3A80%2Fannounce", "udp%3A%2F%2Fpeerfect.org%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.pirateparty.gr%3A6969%2Fannounce", "udp%3A%2F%2Ftracker.vanitycore.co%3A6969%2Fannounce", "udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce", "udp%3A%2F%2Ftracker.torrent.eu.org%3A451", "udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce", "udp%3A%2F%2Ftracker.open-internet.nl%3A6969%2Fannounce"});
     
     private static final Map<TVShow, List<Torrent>> torrents = new HashMap<>();
     
     private static List<Torrent> getTorrentList()
     {
-        Stream<Torrent> result = HTTPUtils.getFromZip("https://www.ettv.tv/dumps/ettv_full.txt.gz").filter(s -> s.contains("|TV|")).map(ETTVApi::parse).filter(Objects::nonNull)/*.filter(Objects::nonNull)*/;
-        return result.collect(Collectors.toList());
+        List<String> lines = HTTPUtils.getOrDownloadFile("https://www.ettv.tv/dumps/ettv_full.txt.gz");
+        
+        List<Torrent> torrents = new ArrayList<>();
+        for (String torrentLine : lines)
+        {
+            if (torrentLine.contains("|TV|"))
+            {
+                Torrent torrent = ETTVApi.parse(torrentLine);
+                
+                if (torrent != null)
+                {
+                    torrents.add(torrent);
+                }
+            }
+        }
+        
+        return torrents;
     }
     
     private static Map<TVShow, List<Torrent>> getTorrentMap()

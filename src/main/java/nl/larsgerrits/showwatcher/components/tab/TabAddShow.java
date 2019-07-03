@@ -13,7 +13,7 @@ import nl.larsgerrits.showwatcher.controller.MainController;
 import nl.larsgerrits.showwatcher.manager.ShowManager;
 import nl.larsgerrits.showwatcher.show.TVShow;
 
-public class TabAdd extends Tab
+public class TabAddShow extends Tab
 {
     public static final FontAwesomeIconView PLUS = new FontAwesomeIconView(FontAwesomeIcon.PLUS, "20px");
     
@@ -21,7 +21,7 @@ public class TabAdd extends Tab
     
     private MainController controller;
     
-    public TabAdd(MainController controller)
+    public TabAddShow(MainController controller)
     {
         this.controller = controller;
         

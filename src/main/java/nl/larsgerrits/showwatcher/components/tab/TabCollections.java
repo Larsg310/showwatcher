@@ -77,7 +77,7 @@ public class TabCollections extends Tab
         //                {
         //                    for (TVEpisode episode : season)
         //                    {
-        //                        if (episode.getVideoFile().isEmpty() && episode.getReleaseDate().getTime() != 0 && episode.getReleaseDate().getTime() < System.currentTimeMillis())
+        //                        if (episode.getVideoFilePath().isEmpty() && episode.getReleaseDate().getTime() != 0 && episode.getReleaseDate().getTime() < System.currentTimeMillis())
         //                        {
         //                            System.out.println(show.getTitle() + ": " + season.getSeasonNumber() + "x" + String.format("%02d", episode.getEpisodeNumber()));
         //                            // DownloadManager.downloadEpisode(episode);

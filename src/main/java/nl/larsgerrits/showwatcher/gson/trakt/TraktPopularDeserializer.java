@@ -12,18 +12,23 @@ public class TraktPopularDeserializer implements JsonDeserializer<List<TVShow>>
     @Override
     public List<TVShow> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
     {
-        List<TVShow> popular = new ArrayList<>();
-        
-        JsonArray shows = json.getAsJsonArray();
-        
-        for (JsonElement showElement : shows)
+    
+            List<TVShow> popular = new ArrayList<>();
+        try
         {
-            JsonObject showObject = showElement.getAsJsonObject().get("show").getAsJsonObject();
-            
-            String imdbId = showObject.get("ids").getAsJsonObject().get("imdb").getAsString();
-            String title = showObject.get("title").getAsString();
-            
-            popular.add(new TVShow(title, imdbId));
+            JsonArray shows = json.getAsJsonArray();
+    
+            for (JsonElement showElement : shows)
+            {
+                JsonObject showObject = showElement.getAsJsonObject().get("show").getAsJsonObject();
+        
+                String imdbId = showObject.get("ids").getAsJsonObject().get("imdb").getAsString();
+                String title = showObject.get("title").getAsString();
+        
+                popular.add(new TVShow(title, imdbId));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return popular;
     }

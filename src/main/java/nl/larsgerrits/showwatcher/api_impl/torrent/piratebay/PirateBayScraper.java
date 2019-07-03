@@ -9,6 +9,8 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static nl.larsgerrits.showwatcher.api_impl.torrent.ettv.ETTVApi.TRACKERS;
+
 public class PirateBayScraper
 {
     
@@ -35,7 +37,7 @@ public class PirateBayScraper
                     String name = torrentName.text();
                     
                     Element torrentMagnet = td2.children().select("a").get(1);
-                    String magnetUrl = torrentMagnet.attr("href");
+                    String magnetUrl = torrentMagnet.attr("href")  + "&tr=" + TRACKERS;
                     
                     Element details = td2.select("font").first();
                     String torrentInfo = details.text();

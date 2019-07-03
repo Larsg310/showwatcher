@@ -50,3 +50,7 @@
 .glyph-icon, #text {
     -fx-fill: -fx-primary-text;
 }
+
+/*#downloadQueue {*/
+    /*-fx-background-color: #ff0000;*/
+/*}*/
